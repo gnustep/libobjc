@@ -23,7 +23,7 @@
 #
 # $Id$
 
-include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/common.make
+include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = gnustep-objc
 VERSION=1.2.3
@@ -162,9 +162,9 @@ ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
 endif
 
 ifeq ($(USE_LIBRARY_MAKE),yes)
-  include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/library.make
+  include $(GNUSTEP_MAKEFILES)/library.make
 else
-  include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/clibrary.make
+  include $(GNUSTEP_MAKEFILES)/clibrary.make
 endif
 
 -include GNUmakefile.postamble

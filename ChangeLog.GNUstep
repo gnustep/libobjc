@@ -1,3 +1,8 @@
+2003-04-04  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Use $(GNUSTEP_MAKEFILES) instead of
+	$(GNUSTEP_SYSTEM_ROOT)/Makefiles
+
 2003-03-07  Adam Fedor  <fedor@gnu.org>
 
 	* libobjc.def: Add some symbols
