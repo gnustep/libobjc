@@ -459,7 +459,7 @@ objc_init_statics (void)
    to gather the module pointers so that they may be processed by the
    initialization routines as soon as possible.  */
 
-objc_DECLARE void
+void
 __objc_exec_class (Module_t module)
 {
   /* Have we processed any constructors previously?  This flag is used to

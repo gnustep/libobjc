@@ -27,7 +27,6 @@ Boston, MA 02111-1307, USA.  */
 #ifndef __objc_api_INCLUDE_GNU
 #define __objc_api_INCLUDE_GNU
 
-#include "objc/objc-decls.h"
 #include "objc/objc.h"
 #include "objc/hash.h"
 #include "objc/thr.h"
@@ -98,10 +97,10 @@ struct objc_method_description
 ** The third parameter is a format string in the printf style.
 ** The fourth parameter is a variable list of arguments.
 */
-objc_EXPORT void objc_error(id object, int code, const char* fmt, ...);
-objc_EXPORT void objc_verror(id object, int code, const char* fmt, va_list ap);
+extern void objc_error(id object, int code, const char* fmt, ...);
+extern void objc_verror(id object, int code, const char* fmt, va_list ap);
 typedef BOOL (*objc_error_handler)(id, int code, const char *fmt, va_list ap);
-objc_EXPORT objc_error_handler objc_set_error_handler(objc_error_handler func);
+objc_error_handler objc_set_error_handler(objc_error_handler func);
 
 /*
 ** Error codes
@@ -137,7 +136,7 @@ objc_EXPORT objc_error_handler objc_set_error_handler(objc_error_handler func);
 ** Set this variable nonzero to print a line describing each
 ** message that is sent.  (this is currently disabled)
 */
-objc_EXPORT BOOL objc_trace;
+extern BOOL objc_trace;
 
 
 /* For every class which happens to have statically allocated instances in
@@ -358,7 +357,7 @@ retval_t objc_msg_sendv(id, SEL, arglist_t);
 ** This may e.g. try to load in the class using dynamic loading.
 ** The function is guaranteed to be passed a non-NULL name string.
 */
-objc_EXPORT Class (*_objc_lookup_class)(const char *name);
+extern Class (*_objc_lookup_class)(const char *name);
 
 /*
 ** This is a hook which is called by __objc_exec_class every time a class
@@ -366,14 +365,14 @@ objc_EXPORT Class (*_objc_lookup_class)(const char *name);
 ** dynamic loader determine the classes that have been loaded when
 ** an object file is dynamically linked in.
 */
-objc_EXPORT void (*_objc_load_callback)(Class class, Category* category);
+extern void (*_objc_load_callback)(Class class, Category* category);
 
 /*
 ** Hook functions for allocating, copying and disposing of instances
 */
-objc_EXPORT id (*_objc_object_alloc)(Class class);
-objc_EXPORT id (*_objc_object_copy)(id object);
-objc_EXPORT id (*_objc_object_dispose)(id object);
+extern id (*_objc_object_alloc)(Class class);
+extern id (*_objc_object_copy)(id object);
+extern id (*_objc_object_dispose)(id object);
 
 /*
 ** Standard functions for memory allocation and disposal.
@@ -409,19 +408,19 @@ objc_free(void *mem);
 ** Users should call the normal objc routines above for
 ** memory allocation and disposal within their programs.
 */
-objc_EXPORT void *(*_objc_malloc)(size_t);
-objc_EXPORT void *(*_objc_atomic_malloc)(size_t);
-objc_EXPORT void *(*_objc_valloc)(size_t);
-objc_EXPORT void *(*_objc_realloc)(void *, size_t);
-objc_EXPORT void *(*_objc_calloc)(size_t, size_t);
-objc_EXPORT void (*_objc_free)(void *);
+extern void *(*_objc_malloc)(size_t);
+extern void *(*_objc_atomic_malloc)(size_t);
+extern void *(*_objc_valloc)(size_t);
+extern void *(*_objc_realloc)(void *, size_t);
+extern void *(*_objc_calloc)(size_t, size_t);
+extern void (*_objc_free)(void *);
 
 /*
 **  Hook for method forwarding. This makes it easy to substitute a
 **  library, such as ffcall, that implements closures, thereby avoiding
 **  gcc's __builtin_apply problems.
 */
-objc_EXPORT IMP (*__objc_msg_forward)(SEL);
+extern IMP (*__objc_msg_forward)(SEL);
 
 Method_t class_get_class_method(MetaClass class, SEL aSel);
 
@@ -454,7 +453,7 @@ SEL sel_register_typed_name(const char *name, const char*type);
 
 BOOL sel_is_mapped (SEL aSel);
 
-objc_EXPORT id class_create_instance(Class class);
+extern id class_create_instance(Class class);
 
 static inline const char *
 class_get_class_name(Class class)
@@ -513,7 +512,7 @@ class_get_gc_object_type (Class class)
 }
 
 /* Mark the instance variable as innaccessible to the garbage collector */
-objc_EXPORT void class_ivar_set_gcinvisible (Class class,
+extern void class_ivar_set_gcinvisible (Class class,
 					const char* ivarname,
 					BOOL gcInvisible);
 

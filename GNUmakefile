@@ -69,7 +69,7 @@ GC_HEADER_FILES = \
 
 libobjc_HEADER_FILES = \
 	hash.h objc-list.h sarray.h \
-	objc.h objc-api.h objc-decls.h \
+	objc.h objc-api.h \
 	NXConstStr.h Object.h \
 	Protocol.h encoding.h typedstream.h \
 	thr.h
