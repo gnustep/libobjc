@@ -100,7 +100,7 @@ struct objc_method_description
 objc_EXPORT void objc_error(id object, int code, const char* fmt, ...);
 objc_EXPORT void objc_verror(id object, int code, const char* fmt, va_list ap);
 typedef BOOL (*objc_error_handler)(id, int code, const char *fmt, va_list ap);
-objc_error_handler objc_set_error_handler(objc_error_handler func);
+objc_EXPORT objc_error_handler objc_set_error_handler(objc_error_handler func);
 
 /*
 ** Error codes

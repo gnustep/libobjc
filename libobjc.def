@@ -169,3 +169,4 @@ hash_new
 hash_next
 hash_remove
 hash_value_for_key
+objc_set_error_handler

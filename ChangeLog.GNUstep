@@ -1,3 +1,10 @@
+Thu Sep 12 13:15:00 2002  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* libobjc.def (objc_set_error_handler): Added.
+	(Reported by Roland Schwingel <Roland.Schwingel@onevision.de>).
+	* objc/objc-api.h (objc_set_error_handler): Mark it as 
+	objc_EXPORT.
+
 2002-05-02  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Version 1.2.2
