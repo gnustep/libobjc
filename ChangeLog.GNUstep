@@ -1,3 +1,18 @@
+2003-05-20  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile (VERSION): 1.3.0
+
+2003-05-20  Richard Frith-Macdonald  <rrfm@gnu.org>
+
+	* init.c: Replace last change with Nicola's improved version.
+
+2003-05-12  Richard Frith-Macdonald  <rrfm@gnu.org>
+
+	* init.c: When performing superclass lookups, check to see if the
+	link to the superclass is already resolved and just use it if it is.
+	This prevents the bug of passing a class to the lookup function
+	rather than a string (potential crasher).
+
 2003-04-11  Richard Frith-Macdonald  <rfm@gnu.org>
 
 	* libobjc.def: Add some symbols
