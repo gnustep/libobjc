@@ -151,11 +151,23 @@ ADDITIONAL_INSTALL_DIRS = $(GNUSTEP_HEADERS)/objc
 -include config/$(GNUSTEP_TARGET_CPU)/$(GNUSTEP_TARGET_OS)/config.make
 
 -include GNUmakefile.preamble
+
+# Use library.make for gnustep-make version 1.0.x
+# Use clibrary.make for all other gnustep-make versions
+USE_LIBRARY_MAKE=no
+
 ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
+ ifeq ($(GNUSTEP_MAKE_MINOR_VERSION),0)
+  USE_LIBRARY_MAKE=yes
+ endif
+endif
+
+ifeq ($(USE_LIBRARY_MAKE),yes)
   include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/library.make
 else
   include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/clibrary.make
 endif
+
 -include GNUmakefile.postamble
 
 #ADDITIONAL_INCLUDE_DIRS +=  -Iobjc -I. -I../gcc -I../gcc/config
