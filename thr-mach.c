@@ -27,7 +27,7 @@ Boston, MA 02111-1307, USA.  */
    covered by the GNU General Public License.  */
 
 #include <mach/mach.h>
-#include <mach/cthreads.h>
+#include <mach/threads_info.h>
 #include <objc/thr.h>
 #include "runtime.h"
 

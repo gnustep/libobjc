@@ -1,3 +1,8 @@
+2004-02-17  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Add defs for darwin.
+	* thr-mach.c: Update include.
+
 2003-11-22  Adam Fedor  <fedor@gnu.org>
 
 	* thr-posix.c (__objc_init_thread_system): Set scope to 
