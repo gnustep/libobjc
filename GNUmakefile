@@ -40,6 +40,9 @@ THREADING = posix
 ifeq ($(GNUSTEP_TARGET_OS),mingw32)
 THREADING = win32
 endif
+ifeq ($(GNUSTEP_TARGET_OS), cygwin)
+THREADING = win32
+endif
 
 GC_HEADER_FILES_DIR = ./gc/include
 GC_HEADER_FILES = \
