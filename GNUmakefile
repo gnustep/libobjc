@@ -26,7 +26,7 @@
 include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/common.make
 
 PACKAGE_NAME = gnustep-objc
-VERSION=1.2.0
+VERSION=1.2.2
 
 CVS_MODULE_NAME = objc
 

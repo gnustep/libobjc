@@ -7,7 +7,7 @@ else
 fi
 
 if test "$GNUSTEP_HOST_OS" = mingw32; then
-  CC1OBJ=`cygpath -u $CC1OBJ`
+  CC1OBJ=`$GNUSTEP_MAKEFILES/fixpath.sh -u $CC1OBJ`
 fi
 rm -f tmp-runtime
 echo "" > tmp-runtime
