@@ -1,3 +1,8 @@
+2003-08-31  Adam Fedor  <fedor@gnu.org>
+
+	* selector.c (__objc_register_instance_methods_to_class): Free
+	new_list if not used.
+
 2003-08-19  Jeremy Bettis <jeremy@deadbeef.com>
 
 	* thr-win32.c (__objc_thread_detach): Use _beginthreadex
