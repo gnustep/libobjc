@@ -1,3 +1,10 @@
+Mon Oct  1 03:36:50 2001  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* GNUmakefile (LIBRARY_INSTALL_DIR): Only include this definition
+	for gnustep-make version 1.  Adapted definition to work with
+	latest gnustep-make, where GNUSTEP_TARGET_LIBRARIES has been
+	removed.
+	
 Mon Sep 24 10:37:01 2001  Nicola Pero  <n.pero@mi.flashnet.it>
 
 	* GNUmakefile (THREADING): Use win32 threads for cygwin.
