@@ -22,21 +22,28 @@
 #Makefile.in files.  Some of this stuff may be unnecessary and
 #worthless.
 
-SHELL = /bin/sh
+SHELL = @SHELL@
+MAKEOVERRIDES=
 
 #### Start of system configuration section. ####
 
-srcdir = @srcdir@
-VPATH = @srcdir@
+srcdir = @glibcpp_srcdir@
+VPATH = @glibcpp_srcdir@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 target_alias = @target_alias@
 gcc_version = @gcc_version@
 gcc_version_trigger = @gcc_version_trigger@
+top_srcdir = @top_srcdir@
+toplevel_srcdir = @toplevel_srcdir@
+toolexecdir = @glibcpp_toolexecdir@
+glibcpp_toolexecdir = @glibcpp_toolexecdir@
+glibcpp_toolexeclibdir = @glibcpp_toolexeclibdir@
+
+top_builddir = .
 
 libdir = $(exec_prefix)/lib
 libsubdir = $(libdir)/gcc-lib/$(target_alias)/$(gcc_version)
-incinstalldir = $(libsubdir)/include
 
 # Multilib support variables.
 MULTISRCTOP =
@@ -60,8 +67,9 @@ RANLIB = @RANLIB@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
+WARN_CFLAGS = -W -Wall -Wwrite-strings -Wstrict-prototypes
 GTHREAD_FLAGS=@GTHREAD_FLAGS@
-ALL_CFLAGS = -I. -I$(srcdir) $(CPPFLAGS) $(DEFS) $(CFLAGS) \
+ALL_CFLAGS = -I. -I$(srcdir) $(CPPFLAGS) $(DEFS) $(CFLAGS) $(WARN_CFLAGS) \
 	$(GTHREAD_FLAGS) -DIN_GCC -DIN_TARGET_LIBS
 
 # Libtool
@@ -110,6 +118,7 @@ FLAGS_TO_PASS = \
 	"AR_FLAGS=$(AR_FLAGS)" \
 	"CC=$(CC)" \
 	"CFLAGS=$(CFLAGS)" \
+	"DESTDIR=$(DESTDIR)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"EXTRA_OFILES=$(EXTRA_OFILES)" \
 	"HDEFINES=$(HDEFINES)" \
@@ -129,7 +138,7 @@ FLAGS_TO_PASS = \
 	"tooldir=$(tooldir)"
 
 all: libobjc.la $(OBJC_BOEHM_GC)
-	$(MULTIDO) $(FLAGS_TO_PASS) multi-do DO=all
+	: $(MAKE) ; exec $(MULTIDO) $(FLAGS_TO_PASS) multi-do DO=all
 
 # User-visible header files.
 
@@ -253,11 +262,13 @@ $(OBJC_THREAD_FILE)_gc.lo: $(OBJC_THREAD_FILE).c
 doc: info dvi html
 
 libobjc.la: $(OBJS)
-	$(LIBTOOL_LINK) $(CC) -o $@ $(OBJS) -rpath $(libsubdir) \
+	$(LIBTOOL_LINK) $(CC) -o $@ $(OBJS) \
+		-rpath $(glibcpp_toolexeclibdir) \
 		-version-info $(LIBOBJC_VERSION)
 
 libobjc_gc.la: $(OBJS_GC)
-	$(LIBTOOL_LINK) $(CC) -o $@ $(OBJS_GC) -rpath $(libsubdir) \
+	$(LIBTOOL_LINK) $(CC) -o $@ $(OBJS_GC) \
+		-rpath $(glibcpp_toolexeclibdir) \
 		-version-info $(LIBOBJC_GC_VERSION)
 
 #
@@ -289,18 +300,9 @@ libobjc.dll: libobjc_s.a libobjc_entry.o
 #
 #
 
-info: objc-features.info
-dvi: objc-features.dvi
-html: objc-features_toc.html
-
-objc-features.info: $(srcdir)/objc-features.texi
-	makeinfo -I$(srcdir) $(srcdir)/objc-features.texi
-
-objc-features.dvi: $(srcdir)/objc-features.texi
-	TEXINPUTS="$(srcdir):${TEXINPUTS}" texi2dvi $(srcdir)/objc-features.texi
-
-objc-features_toc.html: objc-features.texi
-	texi2html -split_node $(srcdir)/objc-features.texi
+info:
+dvi:
+html:
 
 Makefile: Makefile.in config.status
 	$(SHELL) config.status
@@ -314,24 +316,24 @@ ${srcdir}/configure: configure.in
 	rm -f config.cache
 	cd ${srcdir} && autoconf
 
-install: install-libs copy-headers
+install: install-libs install-headers
 
 install-libs: installdirs
-	$(LIBTOOL_INSTALL) $(INSTALL_DATA) libobjc.la $(libsubdir)/libobjc.la;
+	$(SHELL) $(toplevel_srcdir)/mkinstalldirs $(DESTDIR)$(glibcpp_toolexeclibdir)
+	$(LIBTOOL_INSTALL) $(INSTALL) libobjc.la $(DESTDIR)$(glibcpp_toolexeclibdir);
 	if [ "$(OBJC_BOEHM_GC)" ]; then \
-	  $(LIBTOOL_INSTALL) $(INSTALL_DATA) libobjc_gc.la \
-				$(libsubdir)/libobjc_gc.la;\
+	  $(LIBTOOL_INSTALL) $(INSTALL) libobjc_gc.la \
+				$(DESTDIR)$(glibcpp_toolexeclibdir);\
 	fi
+	$(MULTIDO) $(FLAGS_TO_PASS) multi-do DO="$@"
+	@-$(LIBTOOL) --mode=finish $(DESTDIR)$(glibcpp_toolexeclibdir)
 
 # Copy Objective C headers to installation include directory.
-copy-headers:
-	-rm -rf $(incinstalldir)/objc
-	-mkdir $(incinstalldir)/objc
-	-chmod a+rx $(incinstalldir)/objc
+install-headers:
+	$(SHELL) $(toplevel_srcdir)/mkinstalldirs $(DESTDIR)$(libsubdir)/include/objc
 	for file in $(OBJC_H); do \
 	  realfile=$(srcdir)/objc/$${file}; \
-	  cp $${realfile} $(incinstalldir)/objc; \
-	  chmod a+r $(incinstalldir)/objc/$${file}; \
+	  $(INSTALL_DATA) $${realfile} $(DESTDIR)$(libsubdir)/include/objc; \
 	done
 
 check uninstall install-strip dist installcheck installdirs:
