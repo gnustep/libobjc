@@ -1,3 +1,8 @@
+2003-11-22  Adam Fedor  <fedor@gnu.org>
+
+	* thr-posix.c (__objc_init_thread_system): Set scope to 
+	PTHREAD_SCOPE_SYSTEM.
+
 2003-08-31  Adam Fedor  <fedor@gnu.org>
 
 	* selector.c (__objc_register_instance_methods_to_class): Free

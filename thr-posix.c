@@ -55,7 +55,9 @@ __objc_init_thread_system(void)
 	   */
       if (pthread_attr_init(&_objc_thread_attribs) == 0)
         {
-          if (pthread_attr_setdetachstate(&_objc_thread_attribs, 
+ 	  if (pthread_attr_setscope(&_objc_thread_attribs, 
+			            PTHREAD_SCOPE_SYSTEM) == 0
+	      && pthread_attr_setdetachstate(&_objc_thread_attribs, 
                                           PTHREAD_CREATE_DETACHED) == 0)
             return 0;
         }
