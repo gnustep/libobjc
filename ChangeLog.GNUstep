@@ -1,0 +1,15 @@
+2001-05-04  Adam Fedor  <fedor@gnu.org>
+
+
+	* Previous changes before importing into GNUstep CVS.
+	* hash.c (hash_add): cast cachep to int.
+	* init.c: Change DEBUG to DEBUG_RUNTIME
+	* libobjc.def: Remove NXConstantString, add thread functions.
+	* linking.m: Remove NXConstantString
+	* selector.c (__sel_register_typed_name): Cast soffset_decode to int.
+	* sendmsg.c: Declare __objc_generate_gc_type_description extern
+	* objc/hash.h: Change extern to objc_EXPORT
+	* objc/runtime.h: Likewise. Change DEBUG to DEBUG_RUNTIME
+	* objc/objc-decl.h: New file.
+	* config: New config directory
+

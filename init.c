@@ -280,7 +280,7 @@ objc_postorder_traverse (objc_class_tree *tree,
 }
 
 /* Used to print a tree class hierarchy. */
-#ifdef DEBUG
+#ifdef DEBUG_RUNTIME
 static void
 __objc_tree_print (objc_class_tree *tree, int level)
 {
@@ -444,7 +444,7 @@ objc_init_statics (void)
    gather the module pointers so that they may be processed by the
    initialization routines as soon as possible */
 
-void
+objc_DECLARE void
 __objc_exec_class (Module_t module)
 {
   /* Have we processed any constructors previously?  This flag is used to
@@ -688,7 +688,7 @@ static void objc_send_load (void)
 
   while (__objc_class_tree_list)
     {
-#ifdef DEBUG
+#ifdef DEBUG_RUNTIME
       objc_preorder_traverse (__objc_class_tree_list->head,
 			      0, __objc_tree_print);
 #endif

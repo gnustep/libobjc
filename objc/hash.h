@@ -30,6 +30,7 @@ Boston, MA 02111-1307, USA.  */
 
 #include <stddef.h>
 #include <string.h>
+#include <objc/objc-decls.h>
 #include <objc/objc.h>
 
 /*
@@ -103,7 +104,7 @@ typedef struct cache
 
 
 /* Two important hash tables.  */
-extern cache_ptr module_hash_table, class_hash_table;
+objc_EXPORT cache_ptr module_hash_table, class_hash_table;
 
 /* Allocate and initialize a hash table.  */ 
 

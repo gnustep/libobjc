@@ -402,7 +402,7 @@ __sel_register_typed_name (const char *name, const char *types,
     }
 
   DEBUG_PRINTF ("Record selector %s[%s] as: %ld\n", name, types, 
-		soffset_decode (i));
+		(long) soffset_decode (i));
   
   {
     int is_new = (l == 0);

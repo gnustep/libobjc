@@ -35,6 +35,6 @@ Boston, MA 02111-1307, USA.  */
 void __objc_linking (void)
 {
   [Object name];
-  [NXConstantString name];
+  //[NXConstantString name];
 }
 

@@ -49,7 +49,6 @@ objc_thread_add
 objc_thread_remove
 __objc_class_name_Object
 __objc_class_name_Protocol
-__objc_class_name_NXConstantString
 objc_error
 __objc_object_alloc
 __objc_object_copy
@@ -60,6 +59,15 @@ object_dispose
 __objc_init_selector_tables
 __objc_register_selectors_from_class
 __sel_register_typed_name
+__objc_runtime_mutex
+__objc_is_multi_threaded
+__objc_runtime_threads_alive
+objc_set_thread_callback
+objc_condition_allocate
+objc_condition_deallocate
+objc_condition_wait
+objc_condition_broadcast
+objc_condition_signal
 sel_get_any_typed_uid
 sel_get_any_uid
 sel_get_name
