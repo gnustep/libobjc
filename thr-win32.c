@@ -229,44 +229,265 @@ __objc_mutex_unlock(objc_mutex_t mutex)
 
 /* Backend condition mutex functions */
 
+#define MAX_EVENTS_TO_SET 2048
+
+typedef struct
+{
+    int bottom;		/* Lower index of circular array */
+    int top;		/* Upper index +1 of circular array */
+    /* If top-bottom==0 there are no elements in the array.  The first
+       element will increase top with 1 and all subsequent elements
+       added will increase both. Each element removed from head will
+       only increase bottom with 1.
+       By definition eventsToSet[MAX_EVENTS_TO_SET]==eventsToSet[0].
+    */
+    HANDLE eventsToSet[MAX_EVENTS_TO_SET];	/* Circular array containing the events that are yet to be set */
+    objc_mutex_t mutex;	/* Mutex that guards this condition struct */
+
+    objc_thread_t broadcast_busy; /* == thread id of thread that is currently broadcasting or 0 if none is. */
+} objc_condition_win32_backend;
+
+
+int objc_condition_win32_backend_init(objc_condition_win32_backend *cond)
+{
+    cond->mutex = objc_mutex_allocate();
+    if (cond->mutex == 0)
+        return -1;
+
+    if (objc_mutex_lock(cond->mutex)<1)
+        return -1;
+    
+    cond->bottom = 0;
+    cond->top = 0;
+    cond->broadcast_busy = 0;
+
+    objc_mutex_unlock(cond->mutex);
+
+    return 0;
+}
+
+
+int objc_condition_win32_backend_destroy(objc_condition_win32_backend *cond)
+{
+    int i;
+    
+    if (objc_mutex_lock(cond->mutex)<1)
+        return -1;
+
+    if (cond->top<cond->bottom)
+        cond->top += MAX_EVENTS_TO_SET;
+    for (i=cond->bottom; i<cond->top; i++)
+        {
+        if (i>=MAX_EVENTS_TO_SET)
+            CloseHandle(cond->eventsToSet[i-MAX_EVENTS_TO_SET]);
+        else
+            CloseHandle(cond->eventsToSet[i]);
+        }
+
+    objc_mutex_deallocate(cond->mutex);
+
+    return 0;
+}
+
+
+int nrOfEventsInCondition(objc_condition_win32_backend *cond)
+/* Calling thread must already have locked cond->mutex */
+{
+    int nr=cond->top-cond->bottom;
+    
+    if (nr<0)
+        return nr+MAX_EVENTS_TO_SET;
+    else
+        return nr;
+}
+
+
+HANDLE objc_condition_win32_backend_register_at_condition(objc_condition_win32_backend *cond)
+/* Return a fresh event handle that has been added at the top of the list of cond. */
+{
+    HANDLE event = CreateEvent (NULL,  /* no security */
+                                FALSE, /* auto-reset */
+                                FALSE, /* non-signaled initially */
+                                NULL); /* unnamed */
+    if (!event)
+        return INVALID_HANDLE_VALUE;
+
+    if (objc_mutex_lock(cond->mutex)<1)
+        {
+        CloseHandle(event);
+        return INVALID_HANDLE_VALUE;
+        }
+
+    if (nrOfEventsInCondition(cond) >= MAX_EVENTS_TO_SET)
+        {
+        objc_mutex_unlock(cond->mutex);
+        CloseHandle(event);
+        return INVALID_HANDLE_VALUE;
+        }
+    
+    if (cond->top == MAX_EVENTS_TO_SET)
+        cond->top=0;
+    
+    cond->eventsToSet[cond->top] = event;
+    cond->top++;
+
+    objc_mutex_unlock(cond->mutex);
+
+    return event;
+}
+
+
+int objc_condition_win32_backend_wait(objc_condition_win32_backend *cond, objc_mutex_t external_mutex)
+{
+    HANDLE event = objc_condition_win32_backend_register_at_condition(cond);
+    if (event==INVALID_HANDLE_VALUE)
+        return -1;
+
+    /* We shouln't use objc_mutex_unlock here to handle the
+     * external_mutex, because objc_condition_wait (which is always
+     * higher up the call chain for this function) expects us _only_ to
+     * handle the backend of external_mutex. Therefore use
+     * __objc_mutex_unlock and __objc_mutex_lock to manipulate
+     * external_mutex. */
+    if (__objc_mutex_unlock(external_mutex))
+        {
+        CloseHandle(event);
+        return -1;
+        }
+
+    /* Actually wait for the condition to be signaled */
+    WaitForSingleObject(event, INFINITE);
+    CloseHandle(event);
+    
+    if (__objc_mutex_lock(external_mutex))
+        {
+        return -1;
+        }
+    
+    return 0;
+}
+
+    
+int objc_condition_win32_backend_signal(objc_condition_win32_backend *cond)
+{
+    HANDLE event=0;
+    
+    /* First make sure we can manipulate cond */
+    if (objc_mutex_lock(cond->mutex)<1)
+        {
+        return -1;
+        }
+
+    /* If there actually is a thread to signal, signal the first one */
+    if (nrOfEventsInCondition(cond))
+        {
+        event = cond->eventsToSet[cond->bottom];
+
+        /* Remove the event from the list */
+        cond->bottom++;
+        if (cond->bottom==MAX_EVENTS_TO_SET)
+            {
+            cond->bottom=0;
+            if (cond->top==MAX_EVENTS_TO_SET)
+                cond->top=0;
+            }
+        }
+
+    /* Done manipulating cond */
+    objc_mutex_unlock(cond->mutex);
+
+    /* Do the actual signaling */
+    if (event)
+        SetEvent(event); /* It will be deallocated by _wait */
+
+    return 0;
+}
+
+
+int objc_condition_win32_backend_broadcast(objc_condition_win32_backend *cond)
+{
+    objc_thread_t current_thread_id;
+
+    if (objc_mutex_lock(cond->mutex)<1)
+        return -1;
+
+    current_thread_id = __objc_thread_id();
+
+    if (cond->broadcast_busy == current_thread_id)
+        {
+        /* While broadcast is running, broadcast is called on the same
+           thread. This shouldn't happen. Just succeed and return. */
+        objc_mutex_unlock(cond->mutex);
+        return 0;
+        }
+
+    /* If broadcast is called while a broadcast is running on another
+       thread we choose to let the new thread take over the signaling
+       of the events that are still listed. This is to prevent a
+       broadcasting thread to block because some other thread keeps
+       adding waiters for conditional locks and thus keeping the
+       eventsToSet array filled. */
+    cond->broadcast_busy = current_thread_id;
+
+    while (nrOfEventsInCondition(cond) && cond->broadcast_busy==current_thread_id)
+        {
+        objc_mutex_unlock(cond->mutex);
+        if (objc_condition_win32_backend_signal(cond))
+            return -1;
+        objc_mutex_lock(cond->mutex);
+        }
+
+    if (cond->broadcast_busy==current_thread_id)
+        cond->broadcast_busy=0;
+    
+    objc_mutex_unlock(cond->mutex);
+
+    return 0;
+}
+
+
 /* Allocate a condition. */
 int
 __objc_condition_allocate(objc_condition_t condition)
 {
-  /* Unimplemented. */
-  return -1;
+    condition->backend = objc_malloc(sizeof(objc_condition_win32_backend));
+    return objc_condition_win32_backend_init((objc_condition_win32_backend *)(condition->backend));
 }
 
 /* Deallocate a condition. */
 int
 __objc_condition_deallocate(objc_condition_t condition)
 {
-  /* Unimplemented. */
-  return -1;
+    int return_value = objc_condition_win32_backend_destroy((objc_condition_win32_backend *)(condition->backend));
+    if (return_value==0)
+        objc_free(condition->backend);
+    return return_value;
 }
+
 
 /* Wait on the condition */
 int
-__objc_condition_wait(objc_condition_t condition, objc_mutex_t mutex)
+__objc_condition_wait(objc_condition_t condition, objc_mutex_t external_mutex)
 {
-  /* Unimplemented. */
-  return -1;
+    return objc_condition_win32_backend_wait(
+        (objc_condition_win32_backend *)(condition->backend),
+        external_mutex);
 }
 
 /* Wake up all threads waiting on this condition. */
 int
 __objc_condition_broadcast(objc_condition_t condition)
 {
-  /* Unimplemented. */
-  return -1;
+    return objc_condition_win32_backend_broadcast(
+        (objc_condition_win32_backend *)(condition->backend));
 }
 
 /* Wake up one thread waiting on this condition. */
 int
 __objc_condition_signal(objc_condition_t condition)
 {
-  /* Unimplemented. */
-  return -1;
+    return objc_condition_win32_backend_signal(
+        (objc_condition_win32_backend *)(condition->backend));
 }
 
 /* End of File */

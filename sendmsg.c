@@ -61,8 +61,6 @@ static void __objc_install_dispatch_table_for_class (Class);
 /* Forward declare some functions */
 static void __objc_init_install_dtable (id, SEL);
 
-extern void __objc_generate_gc_type_description (Class class);
-
 /* Various forwarding functions that are used based upon the
    return type for the selector.
    __objc_block_forward for structures.

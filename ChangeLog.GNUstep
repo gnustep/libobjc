@@ -1,6 +1,23 @@
+2003-02-23  Tom Koelman  <tkoelman@xs4all.nl>
+
+       * thr-win32.c: Added objc_condition_win32_backend struct.
+       (objc_condition_win32_backend_init): Added.
+       (__objc_condition_allocate): implemented.
+       (__objc_condition_deallocate): implemented.
+       (__objc_condition_wait): implemented.
+       (__objc_condition_broadcast): implemented.
+       (__objc_condition_signal): implemented.
+       (objc_condition_win32_backend_init): New function.
+       (objc_condition_win32_backend_destroy): New function.
+       (objc_condition_win32_backend_wait): New function.
+       (objc_condition_win32_backend_signal): New function.
+       (objc_condition_win32_backend_broadcast): New function.
+       (objc_condition_win32_backend_register_at_condition): New function.
+       (nrOfEventsInCondition): New function.
+
 2003-02-22  Adam Fedor  <fedor@gnu.org>
 
-	* Import from recent gcc CVS. Bump version to 1.2.3
+	* Import from recent gcc CVS.
 
 Tue Feb 11 17:11:00 2003  Richard Frith-Macdonald <richard@brainstorm.co.uk>
 
