@@ -30,6 +30,12 @@ Boston, MA 02111-1307, USA.  */
 #include "runtime.h"
 #include <pthread.h>
 
+#ifdef MISSING_SCHED_PARAM_STRUCT
+struct sched_param {
+  int sched_priority;
+};
+#endif
+
 /* Key structure for maintaining thread specific storage */
 static pthread_key_t _objc_thread_storage;
 static pthread_attr_t _objc_thread_attribs;
@@ -96,6 +102,7 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
 int
 __objc_thread_set_priority(int priority)
 {
+#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING)
   pthread_t thread_id = pthread_self();
   int policy;
   struct sched_param params;
@@ -123,6 +130,8 @@ __objc_thread_set_priority(int priority)
       if (pthread_setschedparam(thread_id, policy, &params) == 0)
         return 0;
     }
+#endif /* _POSIX_THREAD_PRIORITY_SCHEDULING */
+
   return -1;
 }
 

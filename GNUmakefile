@@ -48,6 +48,9 @@ CLIBRARY_NAME = libobjc
 
 # dce, decosf1, irix, mach, os2, posix, pthreads, single, solaris, vxworks
 THREADING = posix
+ifeq ($(GNUSTEP_TARGET_OS),netbsdelf)
+ADDITIONAL_CPPFLAGS += -DMISSING_SCHED_PARAM_STRUCT
+endif
 ifeq ($(GNUSTEP_TARGET_OS),mingw32)
 THREADING = win32
 endif
