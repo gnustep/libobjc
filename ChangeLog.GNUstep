@@ -1,3 +1,9 @@
+Thu Oct 25 10:49:00 2001  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* GNUmakefile (USE_LIBRARY_MAKE): New variable.  Updated code to
+	decide if library.make or clibrary.make is needed to match the 
+	actual gnustep-make version which is going to be 1.2.0.
+
 Tue Oct 16 03:39:21 2001  Nicola Pero  <n.pero@mi.flashnet.it>
 
 	* GNUmakefile (LIBRARY_INSTALL_DIR): Reverted last change.
