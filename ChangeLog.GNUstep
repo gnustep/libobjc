@@ -1,3 +1,8 @@
+Thu Apr 18 11:29:04 2002  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* objc/objc-decls.h: Updated to latest gnustep-make conventions
+	on Windows DLL import/export.
+
 2002-03-14  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Version 1.2.0
