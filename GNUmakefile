@@ -68,11 +68,11 @@ GC_HEADER_FILES = \
 	weakpointer.h	\
 
 libobjc_HEADER_FILES = \
-	objc/hash.h objc/objc-list.h objc/sarray.h \
-	objc/objc.h objc/objc-api.h objc/objc-decls.h \
-	objc/NXConstStr.h objc/Object.h \
-	objc/Protocol.h objc/encoding.h objc/typedstream.h \
-	objc/thr.h
+	hash.h objc-list.h sarray.h \
+	objc.h objc-api.h objc-decls.h \
+	NXConstStr.h Object.h \
+	Protocol.h encoding.h typedstream.h \
+	thr.h
 
 libobjc_OBJC_FILES = \
 	Object.m	\
@@ -113,8 +113,8 @@ CC1OBJ = `$(CC) -print-prog-name=cc1obj`
 
 ADDITIONAL_CFLAGS += -Wall
 
-libobjc_HEADER_FILES_DIR         = .
-libobjc_HEADER_FILES_INSTALL_DIR = 
+libobjc_HEADER_FILES_DIR         = objc
+libobjc_HEADER_FILES_INSTALL_DIR = objc
 
 libobjc_DLL_DEF = libobjc.def
 
@@ -145,9 +145,6 @@ GC_OFILES = \
 
 ADDITIONAL_LIBRARY_OBJ_FILES = $(addprefix gc/, $(GC_OFILES))
 endif
-
-# Additional directories to be created during installation
-ADDITIONAL_INSTALL_DIRS = $(GNUSTEP_HEADERS)/objc
 
 -include config/$(GNUSTEP_TARGET_CPU)/config.make
 -include config/$(GNUSTEP_TARGET_CPU)/$(GNUSTEP_TARGET_OS)/config.make
