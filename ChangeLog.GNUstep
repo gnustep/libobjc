@@ -1,3 +1,7 @@
+2002-03-14  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Version 1.2.0
+
 Thu Nov 22 01:14:31 2001  Nicola Pero  <n.pero@mi.flashnet.it>
 
 	* GNUmakefile (CVS_MODULE_NAME): Define.

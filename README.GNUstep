@@ -28,6 +28,10 @@ make shared=yes
 ------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------
+Version 1.2.0
+-------------
+Updated for changes in newer gnustep-make.
+
 Version 1.0.0
 -------------
 Set threading for mingw32. Use DEBUG_RUNTIME rather than DEBUG to add
