@@ -31,6 +31,7 @@ Boston, MA 02111-1307, USA.  */
 #define __OBJC__
 #endif
 #include <windows.h>
+#include <process.h>
 
 /* Key structure for maintaining thread specific storage */
 static DWORD	__objc_data_tls = (DWORD)-1;
@@ -66,10 +67,18 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
   DWORD	thread_id = 0;
   HANDLE win32_handle;
 
+#ifndef __MINGW__
   if (!(win32_handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func,
                                    arg, 0, &thread_id)))
+#else 
+  unsigned	thread_id = 0;
+  unsigned long win32_handle;
+  // According to MSDN documentation threads which use libc functions should call _beginthreadex not CreateThread
+  if (-1 == (win32_handle = _beginthreadex(NULL, 0, (void*)func, arg, 0, &thread_id)))
+#endif
     thread_id = 0;
-  
+    
+  CloseHandle((HANDLE)win32_handle);
   return (objc_thread_t)thread_id;
 }
 
@@ -141,7 +150,11 @@ int
 __objc_thread_exit(void)
 {
   /* exit the thread */
+#ifndef __MINGW__
   ExitThread(__objc_thread_exit_status);
+#else
+  _endthreadex(__objc_thread_exit_status);
+#endif
 
   /* Failed if we reached here */
   return -1;

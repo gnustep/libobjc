@@ -1,3 +1,8 @@
+2003-08-19  Jeremy Bettis <jeremy@deadbeef.com>
+
+	* thr-win32.c (__objc_thread_detach): Use _beginthreadex
+	(__objc_thread_exit): Use _endthreadex.
+
 2003-08-12  Adam Fedor  <fedor@gnu.org>
 
 	* thr-posix.c (__objc_thread_set_priority): Don't use if
