@@ -26,7 +26,7 @@
 include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/common.make
 
 PACKAGE_NAME = gnustep-objc
-VERSION=1.0.0
+VERSION=1.0.1
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 

@@ -1,3 +1,7 @@
+2001-05-29  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Version 1.0.1
+
 2001-05-24  Adam Fedor  <fedor@gnu.org>
 
 	* init.c (__objc_send_message_in_list): Use method_imp as hash key
@@ -8,6 +12,7 @@
 
 2001-05-04  Adam Fedor  <fedor@gnu.org>
 
+	* Version 1.0.0
 	* Previous changes before importing into GNUstep CVS.
 	* hash.c (hash_add): cast cachep to int.
 	* init.c: Change DEBUG to DEBUG_RUNTIME
