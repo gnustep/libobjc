@@ -1,5 +1,12 @@
-2001-05-04  Adam Fedor  <fedor@gnu.org>
+2001-05-24  Adam Fedor  <fedor@gnu.org>
 
+	* init.c (__objc_send_message_in_list): Use method_imp as hash key
+	(typo fix);
+
+	* GNUmakefile (runtime-info.h): Special rule for mingw32 using...
+	* get-runtime-info: New script.
+
+2001-05-04  Adam Fedor  <fedor@gnu.org>
 
 	* Previous changes before importing into GNUstep CVS.
 	* hash.c (hash_add): cast cachep to int.
