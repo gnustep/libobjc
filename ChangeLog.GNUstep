@@ -1,3 +1,7 @@
+2001-11-11  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Version 1.1.0
+
 Thu Oct 25 10:49:00 2001  Nicola Pero  <nicola@brainstorm.co.uk>
 
 	* GNUmakefile (USE_LIBRARY_MAKE): New variable.  Updated code to
