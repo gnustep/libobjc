@@ -99,16 +99,49 @@ static struct objc_list *__objc_class_tree_list = NULL;
    should not be destroyed during the execution of the program.  */
 static cache_ptr __objc_load_methods = NULL;
 
-/* Return the super class by resorting to objc_lookup_class()
-   if links are not yet resolved. */
-static Class lookup_super(Class class)
+/* This function is used when building the class tree used to send
+   ordinately the +load message to all classes needing it.  The tree
+   is really needed so that superclasses will get the message before
+   subclasses.
+
+   This tree will contain classes which are being loaded (or have just
+   being loaded), and whose super_class pointers have not yet been
+   resolved.  This implies that their super_class pointers point to a
+   string with the name of the superclass; when the first message is
+   sent to the class (/an object of that class) the class links will
+   be resolved, which will replace the super_class pointers with
+   pointers to the actual superclasses.
+
+   Unfortunately, the tree might also contain classes which had been
+   loaded previously, and whose class links have already been
+   resolved.
+
+   This function returns the superclass of a class in both cases, and
+   can be used to build the determine the class relationships while
+   building the tree.
+*/
+static Class  class_superclass_of_class (Class class)
 {
-  if (class->super_class == Nil)
-    return Nil;
-  if (CLS_ISRESOLV(class))
+  char *super_class_name;
+
+  /* If the class links have been resolved, use the resolved
+   * links.  */
+  if (CLS_ISRESOLV (class))
     return class->super_class;
-  return objc_lookup_class((char*)class->super_class);
+  
+  /* Else, 'class' has not yet been resolved.  This means that its
+   * super_class pointer is really the name of the super class (rather
+   * than a pointer to the actual superclass).  */
+  super_class_name = (char *)class->super_class;
+
+  /* Return Nil for a root class.  */
+  if (super_class_name == NULL)
+    return Nil;
+
+  /* Lookup the superclass of non-root classes.  */
+  return objc_lookup_class (super_class_name);
 }
+
 
 /* Creates a tree of classes whose topmost class is directly inherited
    from `upper' and the bottom class in this tree is
@@ -119,8 +152,10 @@ static Class lookup_super(Class class)
 static objc_class_tree *
 create_tree_of_subclasses_inherited_from (Class bottom_class, Class upper)
 {
-  Class superclass = lookup_super(bottom_class);
-
+  Class superclass = bottom_class->super_class ?
+			objc_lookup_class ((char *) bottom_class->super_class)
+		      : Nil;
+					
   objc_class_tree *tree, *prev;
 
   DEBUG_PRINTF ("create_tree_of_subclasses_inherited_from:");
@@ -131,12 +166,12 @@ create_tree_of_subclasses_inherited_from (Class bottom_class, Class upper)
   tree = prev = objc_calloc (1, sizeof (objc_class_tree));
   prev->class = bottom_class;
 
-  while (superclass != Nil && superclass != upper)
+  while (superclass != upper)
     {
       tree = objc_calloc (1, sizeof (objc_class_tree));
       tree->class = superclass;
       tree->subclasses = list_cons (prev, tree->subclasses);
-      superclass = lookup_super(superclass);
+      superclass = class_superclass_of_class (superclass);
       prev = tree;
     }
 
@@ -164,7 +199,7 @@ __objc_tree_insert_class (objc_class_tree *tree, Class class)
       DEBUG_PRINTF ("1. class %s was previously inserted\n", class->name);
       return tree;
     }
-  else if (lookup_super(class) == tree->class)
+  else if (class_superclass_of_class (class) == tree->class)
     {
       /* If class is a direct subclass of tree->class then add class to the
 	 list of subclasses. First check to see if it wasn't already
@@ -374,7 +409,7 @@ class_is_subclass_of_class (Class class, Class superclass)
     {
       if (class == superclass)
 	return YES;
-      class = lookup_super(class);
+      class = class_superclass_of_class (class);
     }
 
   return NO;
@@ -564,7 +599,7 @@ __objc_exec_class (Module_t module)
 
       /* Check to see if the superclass is known in this point. If it's not
 	 add the class to the unresolved_classes list.  */
-      if (superclass && ! lookup_super (class))
+      if (superclass && ! objc_lookup_class (superclass))
 	unresolved_classes = list_cons (class, unresolved_classes);
    }
 
@@ -676,7 +711,7 @@ objc_send_load (void)
     {
       Class class = unresolved_classes->head;
 
-      while (lookup_super (class))
+      while (objc_lookup_class ((char *) class->super_class))
 	{
 	  list_remove_head (&unresolved_classes);
 	  if (unresolved_classes)
@@ -698,7 +733,6 @@ objc_send_load (void)
      other classes are known, delay sending of +load. */
   if (!objc_lookup_class ("NXConstantString") ||
       !objc_lookup_class ("Object"))
-    return;
 #else
   /*
    * The above check prevents +load being called at all if NXConstantString

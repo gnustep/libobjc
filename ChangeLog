@@ -1,3 +1,7 @@
+2003-05-20  Richard Frith-Macdonald  <rrfm@gnu.org>
+
+	* init.c: Replace last change with Nicola's improved version.
+
 2003-05-12  Richard Frith-Macdonald  <rrfm@gnu.org>
 
 	* init.c: When performing superclass lookups, check to see if the
