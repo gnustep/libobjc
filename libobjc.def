@@ -94,6 +94,10 @@ method_get_sizeof_arguments
 objc_aligned_size
 objc_alignof_type
 objc_get_type_qualifiers
+objc_layout_finish_structure
+objc_layout_structure_get_info
+objc_layout_structure
+objc_layout_structure_next_member
 objc_promoted_size
 objc_sizeof_type
 objc_skip_argspec

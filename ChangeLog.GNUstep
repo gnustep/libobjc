@@ -1,3 +1,7 @@
+2003-04-11  Richard Frith-Macdonald  <rfm@gnu.org>
+
+	* libobjc.def: Add some symbols
+
 2003-04-04  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Use $(GNUSTEP_MAKEFILES) instead of
