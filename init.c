@@ -681,6 +681,16 @@ static void objc_send_load (void)
   if (!objc_lookup_class ("NXConstantString") ||
       !objc_lookup_class ("Object"))
     return;
+#else
+  /*
+   * The above check prevents +load being called at all if NXConstantString
+   * is never created (common on modern systems).  However, completely
+   * removing it causes the runtime test in the GNUstep base library
+   * configure to fail (for some unknown reason), so we retain the check for
+   * the existence of the Object class.
+   */
+  if (!objc_lookup_class ("Object"))
+    return;
 #endif
 
   /* Iterate over all modules in the __objc_module_list and call on them the
