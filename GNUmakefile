@@ -30,16 +30,19 @@ VERSION=1.0.1
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
-# make sure we don't install into a library combo dir
+# make sure we don't install in a library-combo dir 
+# (this is only for gnustep-make 1, newer gnustep-makes use
+# clibrary.make so these settings will be ignored)
 ifeq ($(GNUSTEP_FLATTENED),)
   LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)/$(GNUSTEP_TARGET_DIR)
 else
   LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)
 endif
-endif
 
+# for gnustep-make 1
 LIBRARY_NAME = libobjc
+# for gnustep-make > 1 
+CLIBRARY_NAME = libobjc
 
 # dce, decosf1, irix, mach, os2, posix, pthreads, single, solaris, vxworks
 THREADING = posix
@@ -148,7 +151,11 @@ ADDITIONAL_INSTALL_DIRS = $(GNUSTEP_HEADERS)/objc
 -include config/$(GNUSTEP_TARGET_CPU)/$(GNUSTEP_TARGET_OS)/config.make
 
 -include GNUmakefile.preamble
-include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/library.make
+ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
+  include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/library.make
+else
+  include $(GNUSTEP_SYSTEM_ROOT)/Makefiles/clibrary.make
+endif
 -include GNUmakefile.postamble
 
 #ADDITIONAL_INCLUDE_DIRS +=  -Iobjc -I. -I../gcc -I../gcc/config
