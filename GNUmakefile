@@ -30,8 +30,14 @@ VERSION=1.0.1
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-# Make sure it doesn't get installed in library_combo dir
-LIBRARY_INSTALL_DIR = $(GNUSTEP_TARGET_LIBRARIES)
+ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
+# make sure we don't install into a library combo dir
+ifeq ($(GNUSTEP_FLATTENED),)
+  LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)/$(GNUSTEP_TARGET_DIR)
+else
+  LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)
+endif
+endif
 
 LIBRARY_NAME = libobjc
 
