@@ -1,3 +1,9 @@
+Wed Jul 30 17:45:21 2003  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* Protocol.m ([-conformsTo:]): If the argument is nil, return NO.
+	([-hash], [-isEqual:]): New methods.
+	(Suggestion by Jeremy Bettis <jeremy@deadbeef.com>)
+
 2001-07-04  Richard Frith-Macdonald  <rrfm@gnu.org>
 
 	* Protocol.m: ([-descriptionForClassMethod:])

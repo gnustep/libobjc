@@ -56,6 +56,9 @@ struct objc_method_description_list {
   size_t i;
   struct objc_protocol_list* proto_list;
 
+  if (aProtocolObject == nil)
+    return NO;
+
   if (!strcmp(aProtocolObject->protocol_name, self->protocol_name))
     return YES;
 
@@ -133,4 +136,29 @@ struct objc_method_description_list {
   return NULL;
 }
 
+- (unsigned) hash
+{
+  /* Compute a hash of the protocol_name; use the same hash algorithm
+   * that we use for class names; protocol names and class names are
+   * somewhat similar types of string spaces.
+   */
+  int hash = 0, index;
+  
+  for (index = 0; protocol_name[index] != '\0'; index++)
+    {
+      hash = (hash << 4) ^ (hash >> 28) ^ protocol_name[index];
+    }
+
+  hash = (hash ^ (hash >> 10) ^ (hash >> 20));
+
+  return hash;
+}
+
+- (BOOL) isEqual: (id)obj
+{
+  if (strcmp (protocol_name, [obj name]) == 0)
+    return YES;
+
+  return NO;
+}
 @end
