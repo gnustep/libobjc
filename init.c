@@ -674,12 +674,14 @@ static void objc_send_load (void)
 	return;
     }
 
+#if 0
   /* Special check to allow creating and sending messages to constant strings
      in +load methods. If these classes are not yet known, even if all the
      other classes are known, delay sending of +load. */
   if (!objc_lookup_class ("NXConstantString") ||
       !objc_lookup_class ("Object"))
     return;
+#endif
 
   /* Iterate over all modules in the __objc_module_list and call on them the
      __objc_create_classes_tree function. This function creates a tree of

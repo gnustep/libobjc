@@ -1,3 +1,10 @@
+Tue Feb 11 17:11:00 2003  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* init.c: Don't do the check to see if Object and NXConstantString
+	are set up before calling +load ... NXConstantString is never set
+	when we use gcc-3.0 and later in GNUstep ... which means that
+	+load would never be sent.
+
 2001-05-01  Mark Mitchell  <mark@codesourcery.com>
 
 	* fdl.texi: New file.
