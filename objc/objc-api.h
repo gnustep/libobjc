@@ -1,5 +1,5 @@
 /* GNU Objective-C Runtime API.
-   Copyright (C) 1993, 1995, 1996, 1997 Free Software Foundation, Inc.
+   Copyright (C) 1993, 1995, 1996, 1997, 2002 Free Software Foundation, Inc.
 
 This file is part of GNU CC.
 
@@ -76,6 +76,7 @@ struct objc_method_description
 #define _C_UNION_E  ')'
 #define _C_STRUCT_B '{'
 #define _C_STRUCT_E '}'
+#define _C_VECTOR   '!'
 
 
 /*
@@ -261,7 +262,7 @@ typedef struct objc_method_list {
 
 struct objc_protocol_list {
   struct objc_protocol_list *next;
-  int count;
+  size_t count;
   Protocol *list[1];
 };
 
@@ -579,21 +580,23 @@ object_get_super_class
 }
 
 static inline BOOL
-object_is_class(id object)
+object_is_class (id object)
 {
-  return CLS_ISCLASS((Class)object);
+  return ((object != nil)  &&  CLS_ISMETA (object->class_pointer));
+}
+ 
+static inline BOOL
+object_is_instance (id object)
+{
+  return ((object != nil)  &&  CLS_ISCLASS (object->class_pointer));
 }
 
 static inline BOOL
-object_is_instance(id object)
+object_is_meta_class (id object)
 {
-  return (object!=nil)&&CLS_ISCLASS(object->class_pointer);
-}
-
-static inline BOOL
-object_is_meta_class(id object)
-{
-  return CLS_ISMETA((Class)object);
+  return ((object != nil)
+	  &&  !object_is_instance (object)  
+	  &&  !object_is_class (object));
 }
 
 struct sarray* 
