@@ -1,3 +1,7 @@
+Mon Sep 24 10:37:01 2001  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* GNUmakefile (THREADING): Use win32 threads for cygwin.
+	
 2001-05-29  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Version 1.0.1
