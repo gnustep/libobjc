@@ -1,3 +1,7 @@
+Thu Nov 22 01:14:31 2001  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* GNUmakefile (CVS_MODULE_NAME): Define.
+
 2001-11-11  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Version 1.1.0
@@ -14,7 +18,7 @@ Tue Oct 16 03:39:21 2001  Nicola Pero  <n.pero@mi.flashnet.it>
 	(CLIBRARY_NAME): Define for gnustep-make version later than 1.
 	* GNUmakefile: Include library.make if gnustep-make version 
 	is 1; include clibrary.make if gnustep-make version is > 1.
-	
+
 Mon Oct  1 03:36:50 2001  Nicola Pero  <n.pero@mi.flashnet.it>
 
 	* GNUmakefile (LIBRARY_INSTALL_DIR): Only include this definition
