@@ -99,6 +99,17 @@ static struct objc_list *__objc_class_tree_list = NULL;
    should not be destroyed during the execution of the program.  */
 static cache_ptr __objc_load_methods = NULL;
 
+/* Return the super class by resorting to objc_lookup_class()
+   if links are not yet resolved. */
+static Class lookup_super(Class class)
+{
+  if (class->super_class == Nil)
+    return Nil;
+  if (CLS_ISRESOLV(class))
+    return class->super_class;
+  return objc_lookup_class((char*)class->super_class);
+}
+
 /* Creates a tree of classes whose topmost class is directly inherited
    from `upper' and the bottom class in this tree is
    `bottom_class'. The classes in this tree are super classes of
@@ -108,10 +119,8 @@ static cache_ptr __objc_load_methods = NULL;
 static objc_class_tree *
 create_tree_of_subclasses_inherited_from (Class bottom_class, Class upper)
 {
-  Class superclass = bottom_class->super_class ?
-			objc_lookup_class ((char *) bottom_class->super_class)
-		      : Nil;
-					
+  Class superclass = lookup_super(bottom_class);
+
   objc_class_tree *tree, *prev;
 
   DEBUG_PRINTF ("create_tree_of_subclasses_inherited_from:");
@@ -122,14 +131,12 @@ create_tree_of_subclasses_inherited_from (Class bottom_class, Class upper)
   tree = prev = objc_calloc (1, sizeof (objc_class_tree));
   prev->class = bottom_class;
 
-  while (superclass != upper)
+  while (superclass != Nil && superclass != upper)
     {
       tree = objc_calloc (1, sizeof (objc_class_tree));
       tree->class = superclass;
       tree->subclasses = list_cons (prev, tree->subclasses);
-      superclass = (superclass->super_class ?
-			objc_lookup_class ((char *) superclass->super_class)
-		      : Nil);
+      superclass = lookup_super(superclass);
       prev = tree;
     }
 
@@ -157,10 +164,7 @@ __objc_tree_insert_class (objc_class_tree *tree, Class class)
       DEBUG_PRINTF ("1. class %s was previously inserted\n", class->name);
       return tree;
     }
-  else if ((class->super_class ?
-		    objc_lookup_class ((char *) class->super_class)
-		  : Nil)
-	    == tree->class)
+  else if (lookup_super(class) == tree->class)
     {
       /* If class is a direct subclass of tree->class then add class to the
 	 list of subclasses. First check to see if it wasn't already
@@ -370,9 +374,7 @@ class_is_subclass_of_class (Class class, Class superclass)
     {
       if (class == superclass)
 	return YES;
-      class = (class->super_class ?
-		  objc_lookup_class ((char *) class->super_class)
-		: Nil);
+      class = lookup_super(class);
     }
 
   return NO;
@@ -562,7 +564,7 @@ __objc_exec_class (Module_t module)
 
       /* Check to see if the superclass is known in this point. If it's not
 	 add the class to the unresolved_classes list.  */
-      if (superclass && ! objc_lookup_class (superclass))
+      if (superclass && ! lookup_super (class))
 	unresolved_classes = list_cons (class, unresolved_classes);
    }
 
@@ -674,7 +676,7 @@ objc_send_load (void)
     {
       Class class = unresolved_classes->head;
 
-      while (objc_lookup_class ((char *) class->super_class))
+      while (lookup_super (class))
 	{
 	  list_remove_head (&unresolved_classes);
 	  if (unresolved_classes)
