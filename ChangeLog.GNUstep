@@ -1,3 +1,25 @@
+2003-08-12  Adam Fedor  <fedor@gnu.org>
+
+	* thr-posix.c (__objc_thread_set_priority): Don't use if
+	__OpenBSD__
+
+2003-08-12  Jeremy Bettis <jeremy@deadbeef.com>
+
+	* sendmsg.c (objc_msg_lookup): If GCC < 3.3, if the receiver
+	object has a class pointer which is equal to the PROTOCOL_VERSION
+	number (0x2), then make it into a proper Protocol object.
+
+Wed Jul 30 17:45:21 2003  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* Protocol.m ([-conformsTo:]): If the argument is nil, return NO.
+	([-hash], [-isEqual:]): New methods.
+	(Suggestion by Jeremy Bettis <jeremy@deadbeef.com>)
+
+2001-07-04  Richard Frith-Macdonald  <rrfm@gnu.org>
+
+	* Protocol.m: ([-descriptionForClassMethod:])
+	([-descriptionForInstanceMethod:]) fix dereference of null pointer.
+
 2003-06-27  Adam Fedor  <fedor@gnu.org>
 
 	* thr-posix.c: Add sched_param struct if missing

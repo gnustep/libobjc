@@ -102,7 +102,7 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
 int
 __objc_thread_set_priority(int priority)
 {
-#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING)
+#if defined(_POSIX_THREAD_PRIORITY_SCHEDULING) && !defined(__OpenBSD__)
   pthread_t thread_id = pthread_self();
   int policy;
   struct sched_param params;

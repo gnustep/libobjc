@@ -174,6 +174,22 @@ objc_msg_lookup (id receiver, SEL op)
   IMP result;
   if (receiver)
     {
+#if __GNUC__ < 3 || (__GNUC__ == 3&& __GNUC_MINOR__ < 3)
+#define PROTOCOL_VERSION 2 // needs to match what is in init.c
+      // This is a dirty hack for GCC < 3.3
+      // Protocols that are referenced in a module, but not implemented by a
+      // class declared in that same module never get initialized, so if
+      // we see the magic number PROTOCOL_VERSION, then the object must be
+      // a Protocol.  It may be just corrupted memory, but in that case
+      // we are going to crash anyway, so no harm done.
+      if (receiver->class_pointer == (void*)PROTOCOL_VERSION) {
+  		static Class proto_class = 0;
+  		if (!proto_class)
+    	  proto_class = objc_lookup_class ("Protocol");
+        if (proto_class)
+          receiver->class_pointer = proto_class;
+      }
+#endif
       result = sarray_get_safe (receiver->class_pointer->dtable, 
 				(sidx)op->sel_id);
       if (result == 0)
