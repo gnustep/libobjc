@@ -1,9 +1,9 @@
 2003-03-07  Adam Fedor  <fedor@gnu.org>
 
-	* GNUmakefile (libobjc_HEADER_FILES): Remove objc-decls.h
 	* libobjc.def: Add some symbols
 	* objc/hash.h: Remove objc_EXPORT prefixes
-	* objc/objc-api.h, objc/runtime.h: Idem.
+	* objc/runtime.h: Idem.
+	* objc/objc-api.h: Remove objc_EXPORT from functions.
 
 2003-02-23  Tom Koelman  <tkoelman@xs4all.nl>
 
