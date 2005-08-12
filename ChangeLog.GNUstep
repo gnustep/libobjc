@@ -1,3 +1,10 @@
+2005-08-12  Adam Fedor  <fedor@gnu.org>
+
+	* init.c (objc_init_statics): Initialize all statics.
+	(__objc_init_protocols): Init all protocols.
+	* sendmsg.c (objc_msg_lookup): Remove old protocol hack.
+	(Patch #4206 from Jeremy Bettis).
+
 2005-03-01 Nicola Pero <n.pero@mi.flashnet.it>
 
 	* objc/objc-decls.h: On MinGW, do not use
