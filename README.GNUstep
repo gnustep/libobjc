@@ -27,6 +27,13 @@ make install
 ------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------
+Version 1.4.0
+-------------
+Fix the protocol initizization bug, various other protocol bugs.
+Don't use dllexport on mingw.
+Various memory leak fixes.
+Work on OpenBSD and NetBSD.
+
 Version 1.3.0
 -------------
 Add conditional threads on win32. Other win32 fixes.
