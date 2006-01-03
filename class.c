@@ -6,20 +6,20 @@
    Lock-free class table code designed and written from scratch by
    Nicola Pero, 2001.
 
-This file is part of GNU CC.
+This file is part of GCC.
 
-GNU CC is free software; you can redistribute it and/or modify it under the
+GCC is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation; either version 2, or (at your option) any later version.
 
-GNU CC is distributed in the hope that it will be useful, but WITHOUT ANY
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 details.
 
 You should have received a copy of the GNU General Public License along with
-GNU CC; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+GCC; see the file COPYING.  If not, write to the Free Software
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, if you link this library with files compiled with
    GCC to produce an executable, this does not cause the resulting executable
@@ -88,12 +88,12 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
   classes from the table - and the difficult thing with lock-free data
   structures is freeing data when is removed from the structures.  */
 
-#include "runtime.h"            /* the kitchen sink */
-#include "sarray.h"
+#include "objc/runtime.h"            /* the kitchen sink */
+#include "objc/sarray.h"
 
-#include <objc/objc.h>
-#include <objc/objc-api.h>
-#include <objc/thr.h>
+#include "objc/objc.h"
+#include "objc/objc-api.h"
+#include "objc/thr.h"
 
 /* We use a table which maps a class name to the corresponding class
  * pointer.  The first part of this file defines this table, and
