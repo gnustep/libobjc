@@ -1,3 +1,14 @@
+2006-01-20  Adam Fedor  <fedor@gnu.org>
+
+	* Import from gcc repository 2006-01-03 with fixups (see
+	ChangeLog for more info).
+	* ChangeLog, GNUmakefile, Protocol.m, encoding.c, hash.c, init.c,
+	libobjc.def, linking.c, sarray.c, selector.c, sendmsg.c, thr-mach.c,
+	thr-objc.c, thr-posix.c, thr-win32.c, objc/hash.h, objc/objc-api.h,
+	objc/objc-decls.h, objc/runtime.h: Import and fixup.
+
+	* README.GNUstep: Update.
+
 2005-08-15  Adam Fedor  <fedor@gnu.org>
 
 	* Version 1.4.0

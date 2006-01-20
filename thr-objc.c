@@ -31,7 +31,7 @@ Boston, MA 02110-1301, USA.  */
 #include "config.h"
 #include "tconfig.h"
 #include "coretypes.h"
-#include "tm.h"
+//#include "tm.h"
 #include "defaults.h"
 #include "objc/thr.h"
 #include "objc/runtime.h"

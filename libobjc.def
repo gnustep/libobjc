@@ -2,43 +2,36 @@
 ;  Copyright (C) 1997 Free Software Foundation, Inc.
 ;  Contributed by Scott Christley <scottc@net-community.com>
 ;
-;  This file is part of GNU CC.
+;  This file is part of GCC.
 ;
-;  GNU CC is free software; you can redistribute it and/or modify it under the
+;  GCC is free software; you can redistribute it and/or modify it under the
 ;  terms of the GNU General Public License as published by the Free Software
 ;  Foundation; either version 2, or (at your option) any later version.
 ;
-;  GNU CC is distributed in the hope that it will be useful, but WITHOUT ANY
+;  GCC is distributed in the hope that it will be useful, but WITHOUT ANY
 ;  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 ;  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 ;  details.
 ;
 ;  You should have received a copy of the GNU General Public License along with
-;  GNU CC; see the file COPYING.  If not, write to the Free Software
-;  Foundation, 59 Temple Place - Suite 330,
-;  Boston, MA 02111-1307, USA.
+;  GCC; see the file COPYING.  If not, write to the Free Software
+;  Foundation, 51 Franklin Street, Fifth Floor,
+;  Boston, MA 02110-1301, USA.
 
 LIBRARY libobjc
 EXPORTS
 search_for_method_in_list
 objc_get_uninstalled_dtable
+objc_hash_is_key_in_hash
 hash_is_key_in_hash
 objc_verror
-_objc_lookup_class
 _objc_load_callback
-__objc_msg_forward
 objc_malloc
 objc_atomic_malloc
 objc_valloc
 objc_realloc
 objc_calloc
 objc_free
-_objc_malloc
-_objc_atomic_malloc
-_objc_valloc
-_objc_realloc
-_objc_calloc
-_objc_free
 __objc_init_thread_system
 objc_mutex_allocate
 objc_mutex_deallocate
@@ -58,24 +51,15 @@ objc_thread_remove
 __objc_class_name_Object
 __objc_class_name_Protocol
 objc_error
-_objc_object_alloc
-_objc_object_copy
-_objc_object_dispose
+__objc_object_alloc
+__objc_object_copy
+__objc_object_dispose
 class_create_instance
 object_copy
 object_dispose
 __objc_init_selector_tables
 __objc_register_selectors_from_class
 __sel_register_typed_name
-__objc_runtime_mutex
-__objc_is_multi_threaded
-__objc_runtime_threads_alive
-objc_set_thread_callback
-objc_condition_allocate
-objc_condition_deallocate
-objc_condition_wait
-objc_condition_broadcast
-objc_condition_signal
 sel_get_any_typed_uid
 sel_get_any_uid
 sel_get_name
@@ -94,10 +78,6 @@ method_get_sizeof_arguments
 objc_aligned_size
 objc_alignof_type
 objc_get_type_qualifiers
-objc_layout_finish_structure
-objc_layout_structure_get_info
-objc_layout_structure
-objc_layout_structure_next_member
 objc_promoted_size
 objc_sizeof_type
 objc_skip_argspec
@@ -175,11 +155,15 @@ sarray_lazy_copy
 sarray_new
 sarray_realloc
 sarray_remove_garbage
+objc_hash_add
 hash_add
+objc_hash_delete
 hash_delete
+objc_hash_new
 hash_new
+objc_hash_next
 hash_next
+objc_hash_remove
 hash_remove
+objc_hash_value_for_key
 hash_value_for_key
-objc_set_error_handler
-class_ivar_set_gcinvisible

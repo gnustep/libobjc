@@ -1,22 +1,22 @@
 /* This file contains the implementation of class Protocol.
-   Copyright (C) 1993 Free Software Foundation, Inc.
+   Copyright (C) 1993, 2004 Free Software Foundation, Inc.
 
-This file is part of GNU CC. 
+This file is part of GCC. 
 
-GNU CC is free software; you can redistribute it and/or modify
+GCC is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2, or (at your option)
 any later version.
 
-GNU CC is distributed in the hope that it will be useful,
+GCC is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNU CC; see the file COPYING.  If not, write to
-the Free Software Foundation, 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.  */
+along with GCC; see the file COPYING.  If not, write to
+the Free Software Foundation, 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.  */
  
 /* As a special exception, if you link this library with files
    compiled with GCC to produce an executable, this does not cause
@@ -83,14 +83,12 @@ struct objc_method_description_list {
   const char* name = sel_get_name (aSel);
   struct objc_method_description *result;
 
-  if (instance_methods != 0)
-    {
-      for (i = 0; i < instance_methods->count; i++)
-	{
-	  if (!strcmp ((char*)instance_methods->list[i].name, name))
-	    return &(instance_methods->list[i]);
-	}
-    }
+  if (instance_methods)
+    for (i = 0; i < instance_methods->count; i++)
+      {
+	if (!strcmp ((char*)instance_methods->list[i].name, name))
+	  return &(instance_methods->list[i]);
+      }
 
   for (proto_list = protocol_list; proto_list; proto_list = proto_list->next)
     {
@@ -113,14 +111,12 @@ struct objc_method_description_list {
   const char* name = sel_get_name (aSel);
   struct objc_method_description *result;
 
-  if (class_methods != 0)
-    {
-      for (i = 0; i < class_methods->count; i++)
-	{
-	  if (!strcmp ((char*)class_methods->list[i].name, name))
-	    return &(class_methods->list[i]);
-	}
-    }
+  if (class_methods)
+    for (i = 0; i < class_methods->count; i++)
+      {
+	if (!strcmp ((char*)class_methods->list[i].name, name))
+	  return &(class_methods->list[i]);
+      }
 
   for (proto_list = protocol_list; proto_list; proto_list = proto_list->next)
     {
@@ -154,11 +150,33 @@ struct objc_method_description_list {
   return hash;
 }
 
+/*
+ * Equality between formal protocols is only formal (nothing to do
+ * with actually checking the list of methods they have!).  Two formal
+ * Protocols are equal if and only if they have the same name.
+ *
+ * Please note (for comparisons with other implementations) that
+ * checking the names is equivalent to checking that Protocol A
+ * conforms to Protocol B and Protocol B conforms to Protocol A,
+ * because this happens iff they have the same name.  If they have
+ * different names, A conforms to B if and only if A includes B, but
+ * the situation where A includes B and B includes A is a circular
+ * dependency between Protocols which is forbidden by the compiler, so
+ * A conforms to B and B conforms to A with A and B having different
+ * names is an impossible case.
+ */
 - (BOOL) isEqual: (id)obj
 {
-  if (strcmp (protocol_name, [obj name]) == 0)
+  if (obj == self)
     return YES;
+
+  if ([obj isKindOf: [Protocol class]])
+    {
+      if (strcmp (protocol_name, ((Protocol *)obj)->protocol_name) == 0)
+	return YES;
+    }
 
   return NO;
 }
 @end
+

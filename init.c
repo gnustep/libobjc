@@ -3,20 +3,20 @@
    Contributed by Kresten Krab Thorup
    +load support contributed by Ovidiu Predescu <ovidiu@net-community.com>
 
-This file is part of GNU CC.
+This file is part of GCC.
 
-GNU CC is free software; you can redistribute it and/or modify it under the
+GCC is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation; either version 2, or (at your option) any later version.
 
-GNU CC is distributed in the hope that it will be useful, but WITHOUT ANY
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 details.
 
 You should have received a copy of the GNU General Public License along with
-GNU CC; see the file COPYING.  If not, write to the Free Software
-Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+GCC; see the file COPYING.  If not, write to the Free Software
+Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, if you link this library with files compiled with
    GCC to produce an executable, this does not cause the resulting executable
@@ -24,7 +24,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    however invalidate any other reasons why the executable file might be
    covered by the GNU General Public License.  */
 
-#include "runtime.h"
+#include "objc/runtime.h"
 
 /* The version number of this runtime.  This must match the number 
    defined in gcc (objc-act.c).  */
@@ -363,10 +363,12 @@ __objc_send_message_in_list (MethodList_t method_list, Class class, SEL op)
       Method_t mth = &method_list->method_list[i];
 
       if (mth->method_name && sel_eq (mth->method_name, op)
-	  && ! hash_is_key_in_hash (__objc_load_methods, mth->method_imp))
+	  && ! objc_hash_is_key_in_hash (__objc_load_methods, mth->method_imp))
 	{
 	  /* Add this method into the +load hash table */
-	  hash_add (&__objc_load_methods, mth->method_imp, mth->method_imp);
+	  objc_hash_add (&__objc_load_methods,
+			 mth->method_imp,
+			 mth->method_imp);
 
 	  DEBUG_PRINTF ("sending +load in class: %s\n", class->name);
 
@@ -458,8 +460,8 @@ objc_init_statics (void)
              haven't been here before.  However, the comparison is to be
              reminded of taking into account class posing and to think about
              possible semantics...  */
-	  else 
-            {
+	  else if (class != statics->instances[0]->class_pointer)
+	    {
 	      id *inst;
 
 	      for (inst = &statics->instances[0]; *inst; inst++)
@@ -538,8 +540,9 @@ __objc_exec_class (Module_t module)
       __objc_init_class_tables ();
       __objc_init_dispatch_tables ();
       __objc_class_tree_list = list_cons (NULL, __objc_class_tree_list);
-      __objc_load_methods
-	  = hash_new (128, (hash_func_type)hash_ptr, compare_ptrs);
+      __objc_load_methods = objc_hash_new (128, 
+					   (hash_func_type)objc_hash_ptr,
+					   objc_compare_ptrs);
       previous_constructors = 1;
     }
 
@@ -727,23 +730,12 @@ objc_send_load (void)
 	return;
     }
 
-#if 0
-  /* Special check to allow creating and sending messages to constant strings
-     in +load methods. If these classes are not yet known, even if all the
-     other classes are known, delay sending of +load. */
-  if (!objc_lookup_class ("NXConstantString") ||
-      !objc_lookup_class ("Object"))
-#else
-  /*
-   * The above check prevents +load being called at all if NXConstantString
-   * is never created (common on modern systems).  However, completely
-   * removing it causes the runtime test in the GNUstep base library
-   * configure to fail (for some unknown reason), so we retain the check for
-   * the existence of the Object class.
-   */
-  if (!objc_lookup_class ("Object"))
+  /* Special check to allow creating and sending messages to constant
+     strings in +load methods. If these classes are not yet known,
+     even if all the other classes are known, delay sending of +load.  */
+  if (! objc_lookup_class ("NXConstantString") ||
+      ! objc_lookup_class ("Object"))
     return;
-#endif
 
   /* Iterate over all modules in the __objc_module_list and call on
      them the __objc_create_classes_tree function. This function
@@ -883,9 +875,6 @@ __objc_init_protocols (struct objc_protocol_list *protos)
 		     (int) ((char *) protos->list[i]->class_pointer
 			    - (char *) 0),
 		     PROTOCOL_VERSION);
-	} else {
-	  /* even if the protocol is initialized, the super protos might not be */
-	  __objc_init_protocols (aProto->protocol_list);
 	}
     }
 

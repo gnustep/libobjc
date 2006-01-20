@@ -177,11 +177,10 @@ endif
 
 -include GNUmakefile.postamble
 
-#ADDITIONAL_INCLUDE_DIRS +=  -Iobjc -I. -I../gcc -I../gcc/config
 ADDITIONAL_INCLUDE_DIRS += \
 	-Iconfig/$(GNUSTEP_TARGET_CPU)/$(GNUSTEP_TARGET_OS) \
 	-Iconfig/$(GNUSTEP_TARGET_CPU)/generic \
-	-Iobjc -I.
+	-I.
 
 before-all:: runtime-info.h
 
@@ -217,12 +216,4 @@ after-clean::
 
 after-distclean::
 	rm -f config.status config.log config.cache
-
-
-
-
-
-
-
-
 
