@@ -1,5 +1,9 @@
 2006-01-20  Adam Fedor  <fedor@gnu.org>
 
+	* GNUmakefile: Update module name.
+
+2006-01-20  Adam Fedor  <fedor@gnu.org>
+
 	* Import from gcc repository 2006-01-03 with fixups (see
 	ChangeLog for more info).
 	* ChangeLog, GNUmakefile, Protocol.m, encoding.c, hash.c, init.c,

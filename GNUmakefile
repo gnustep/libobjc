@@ -27,8 +27,8 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = gnustep-objc
 VERSION=1.4.0
-
-CVS_MODULE_NAME = objc
+CVS_MODULE_NAME = gnustep/dev-libs/libobjc
+CVS_TAG_NAME=objc
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
