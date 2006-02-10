@@ -460,7 +460,8 @@ objc_init_statics (void)
              haven't been here before.  However, the comparison is to be
              reminded of taking into account class posing and to think about
              possible semantics...  */
-	  else if (class != statics->instances[0]->class_pointer)
+/* Due to a compiler bug, sometimes statics->instances[0]->class_pointer == class but  statics->instances[1]->class_pointer == NULL */
+	  else 
 	    {
 	      id *inst;
 
@@ -875,6 +876,9 @@ __objc_init_protocols (struct objc_protocol_list *protos)
 		     (int) ((char *) protos->list[i]->class_pointer
 			    - (char *) 0),
 		     PROTOCOL_VERSION);
+	} else {
+	  /* even if the protocol is initialized, the super protos might not be */
+	  __objc_init_protocols (aProto->protocol_list);
 	}
     }
 

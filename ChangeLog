@@ -1,5 +1,11 @@
 2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
 
+	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC bug 23214
+		(http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23214) In some odd circumstances
+		protocols are not properly initalized.  See the Bugzilla page for testcase.
+	
+2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+
 	* thr-win32.c: There is no such define __MINGW__, changed to __MINGW32__
 	
 2006-01-20  Adam Fedor  <fedor@gnu.org>
