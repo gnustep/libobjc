@@ -1,3 +1,7 @@
+2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* thr-win32.c: There is no such define __MINGW__, changed to __MINGW32__
+	
 2006-01-20  Adam Fedor  <fedor@gnu.org>
 
 	* Import from recent gcc repository 2006-01-03 with fixups (see

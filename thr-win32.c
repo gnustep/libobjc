@@ -67,7 +67,7 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
   DWORD	thread_id = 0;
   HANDLE win32_handle;
 
-#ifndef __MINGW__
+#ifndef __MINGW32__
   if (!(win32_handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func,
                                    arg, 0, &thread_id)))
 #else 
@@ -150,7 +150,7 @@ int
 __objc_thread_exit(void)
 {
   /* exit the thread */
-#ifndef __MINGW__
+#ifndef __MINGW32__
   ExitThread(__objc_thread_exit_status);
 #else
   _endthreadex(__objc_thread_exit_status);
