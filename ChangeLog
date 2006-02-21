@@ -1,3 +1,8 @@
+2006-02-21  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* thr-win32.c: (__objc_thread_detach): Removed duplicate definitions of thread_id and win32_handle.
+	* objc/objc-decls.h: Don't use __dllspec on mingw platform.
+		
 2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
 
 	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC bug 23214

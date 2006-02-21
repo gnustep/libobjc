@@ -71,10 +71,8 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
   if (!(win32_handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func,
                                    arg, 0, &thread_id)))
 #else 
-  unsigned	thread_id = 0;
-  unsigned long win32_handle;
   // According to MSDN documentation threads which use libc functions should call _beginthreadex not CreateThread
-  if (-1 == (win32_handle = _beginthreadex(NULL, 0, (void*)func, arg, 0, &thread_id)))
+  if ((HANDLE)-1 == (win32_handle = (HANDLE)_beginthreadex(NULL, 0, (void*)func, arg, 0, (int*)&thread_id)))
 #endif
     thread_id = 0;
     
