@@ -1,3 +1,9 @@
+2006-02-24  Jeremy Bettis  <jeremy@deadbeef.com>
+
+    * misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.
+    * init.c: (objc_send_load): Removed the check for NXConstantString class to fix +load.
+    	(again see:ChangeLog.GNUstep Tue Feb 11 17:11:00 2003)
+    
 2006-02-21  Jeremy Bettis  <jeremy@deadbeef.com>
 
 	* thr-win32.c: (__objc_thread_detach): Removed duplicate definitions of thread_id and win32_handle.

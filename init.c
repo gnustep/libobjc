@@ -731,12 +731,23 @@ objc_send_load (void)
 	return;
     }
 
-  /* Special check to allow creating and sending messages to constant
-     strings in +load methods. If these classes are not yet known,
-     even if all the other classes are known, delay sending of +load.  */
+#if 0
+  /* Special check to allow creating and sending messages to constant strings
+     in +load methods. If these classes are not yet known, even if all the
+     other classes are known, delay sending of +load. */
   if (! objc_lookup_class ("NXConstantString") ||
       ! objc_lookup_class ("Object"))
+#else
+  /*
+   * The above check prevents +load being called at all if NXConstantString
+   * is never created (common on modern systems).  However, completely
+   * removing it causes the runtime test in the GNUstep base library
+   * configure to fail (for some unknown reason), so we retain the check for
+   * the existence of the Object class.
+   */
+  if (!objc_lookup_class ("Object"))
     return;
+#endif
 
   /* Iterate over all modules in the __objc_module_list and call on
      them the __objc_create_classes_tree function. This function

@@ -165,21 +165,21 @@ noFree (void *p)
 {
 }
 
-void *(*_objc_malloc) (size_t) = GC_malloc;
-void *(*_objc_atomic_malloc) (size_t) = GC_malloc_atomic;
-void *(*_objc_valloc) (size_t) = GC_malloc;
-void *(*_objc_realloc) (void *, size_t) = GC_realloc;
-void *(*_objc_calloc) (size_t, size_t) = GC_calloc;
-void (*_objc_free) (void *) = noFree;
+objc_DECLARE void *(*_objc_malloc) (size_t) = GC_malloc;
+objc_DECLARE void *(*_objc_atomic_malloc) (size_t) = GC_malloc_atomic;
+objc_DECLARE void *(*_objc_valloc) (size_t) = GC_malloc;
+objc_DECLARE void *(*_objc_realloc) (void *, size_t) = GC_realloc;
+objc_DECLARE void *(*_objc_calloc) (size_t, size_t) = GC_calloc;
+objc_DECLARE void (*_objc_free) (void *) = noFree;
 
 #else	/* !OBJC_WITH_GC */
 
-void *(*_objc_malloc) (size_t) = malloc;
-void *(*_objc_atomic_malloc) (size_t) = malloc;
-void *(*_objc_valloc) (size_t) = malloc;
-void *(*_objc_realloc) (void *, size_t) = realloc;
-void *(*_objc_calloc) (size_t, size_t) = calloc;
-void (*_objc_free) (void *) = free;
+objc_DECLARE void *(*_objc_malloc) (size_t) = malloc;
+objc_DECLARE void *(*_objc_atomic_malloc) (size_t) = malloc;
+objc_DECLARE void *(*_objc_valloc) (size_t) = malloc;
+objc_DECLARE void *(*_objc_realloc) (void *, size_t) = realloc;
+objc_DECLARE void *(*_objc_calloc) (size_t, size_t) = calloc;
+objc_DECLARE void (*_objc_free) (void *) = free;
 
 
 #endif	/* !OBJC_WITH_GC */
