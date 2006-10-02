@@ -32,18 +32,6 @@ CVS_TAG_NAME=objc
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-# make sure we don't install in a library-combo dir 
-# (this is only for gnustep-make 1, newer gnustep-makes use
-# clibrary.make so these settings will be ignored)
-ifeq ($(GNUSTEP_FLATTENED),)
-  LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)/$(GNUSTEP_TARGET_DIR)
-else
-  LIBRARY_INSTALL_DIR = $(GNUSTEP_LIBRARIES_ROOT)
-endif
-
-# for gnustep-make 1
-LIBRARY_NAME = libobjc
-# for gnustep-make > 1 
 CLIBRARY_NAME = libobjc
 
 # dce, decosf1, irix, mach, os2, posix, pthreads, single, solaris, vxworks
@@ -159,21 +147,7 @@ endif
 
 -include GNUmakefile.preamble
 
-# Use library.make for gnustep-make version 1.0.x
-# Use clibrary.make for all other gnustep-make versions
-USE_LIBRARY_MAKE=no
-
-ifeq ($(GNUSTEP_MAKE_MAJOR_VERSION),1)
- ifeq ($(GNUSTEP_MAKE_MINOR_VERSION),0)
-  USE_LIBRARY_MAKE=yes
- endif
-endif
-
-ifeq ($(USE_LIBRARY_MAKE),yes)
-  include $(GNUSTEP_MAKEFILES)/library.make
-else
-  include $(GNUSTEP_MAKEFILES)/clibrary.make
-endif
+include $(GNUSTEP_MAKEFILES)/clibrary.make
 
 -include GNUmakefile.postamble
 
