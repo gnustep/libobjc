@@ -1,3 +1,9 @@
+2006-10-02  Nicola Pero  <nicola.pero@meta-innovation.com>
+
+	* GNUmakefile: Drop library.make hack that was used to support
+	versions of gnustep-make older than October 2001.  If your
+	gnustep-make is that old, please upgrade.
+
 2006-01-20  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Update module name.
