@@ -33,7 +33,7 @@ CVS_TAG_NAME=objc
 # FIXME - remove this, but when we remove it, also update
 # gnustep-make's configure.ac script to check in GNUSTEP_LOCAL_ROOT
 # too!  Else this wouldn't be found.
-GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+GNUSTEP_INSTALLATION_DOMAIN = SYSTEM
 
 CLIBRARY_NAME = libobjc
 

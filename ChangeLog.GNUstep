@@ -1,3 +1,8 @@
+2006-11-15  Nicola Pero  <nicola.pero@meta-innovation.com>
+
+	* GNUmakefile (GNUSTEP_INSTALLATION_DOMAIN): Use
+	GNUSTEP_INSTALLATION_DOMAIN instead of GNUSTEP_INSTALLATION_DIR.
+
 2006-10-02  Nicola Pero  <nicola.pero@meta-innovation.com>
 
 	* GNUmakefile: Drop library.make hack that was used to support
