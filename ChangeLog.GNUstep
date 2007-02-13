@@ -1,3 +1,7 @@
+2007-02-13  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile: Set SVN module name/url.
+
 2006-11-15  Nicola Pero  <nicola.pero@meta-innovation.com>
 
 	* GNUmakefile (GNUSTEP_INSTALLATION_DOMAIN): Use

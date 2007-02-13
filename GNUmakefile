@@ -27,8 +27,9 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = gnustep-objc
 VERSION=1.4.0
-CVS_MODULE_NAME = gnustep/dev-libs/libobjc
-CVS_TAG_NAME=objc
+SVN_MODULE_NAME = libobjc
+SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/libs
+SVN_TAG_NAME=objc
 
 # FIXME - remove this, but when we remove it, also update
 # gnustep-make's configure.ac script to check in GNUSTEP_LOCAL_ROOT
