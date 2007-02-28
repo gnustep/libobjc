@@ -1,3 +1,9 @@
+2007-02-28  Nicola Pero  <nicola.pero@meta-innovation.com>	
+
+	* GNUmakefile (GNUSTEP_MAKEFILES): Use gnustep-config to
+	set this up if not already set.  Emit an error if it can't
+	be set.
+
 2007-02-13  Adam Fedor  <fedor@gnu.org>
 
 	* GNUmakefile: Set SVN module name/url.
