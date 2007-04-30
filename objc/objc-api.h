@@ -431,11 +431,14 @@ objc_EXPORT void *(*_objc_calloc)(size_t, size_t);
 objc_EXPORT void (*_objc_free)(void *);
 
 /*
-**  Hook for method forwarding. This makes it easy to substitute a
+**  Hooks for method forwarding. This makes it easy to substitute a
 **  library, such as ffcall, that implements closures, thereby avoiding
-**  gcc's __builtin_apply problems.
+**  gcc's __builtin_apply problems.  __objc_msg_forward2's result will
+**  be preferred over that of __objc_msg_forward if both are set and
+**  return non-NULL.
 */
 objc_EXPORT IMP (*__objc_msg_forward)(SEL);
+objc_EXPORT IMP (*__objc_msg_forward2)(id, SEL);
 
 Method_t class_get_class_method(MetaClass _class, SEL aSel);
 

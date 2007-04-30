@@ -1,3 +1,9 @@
+2007-04-30  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* sendmsg.c: Add forward2
+	* objc/objc-api.h: Add forward2
+	* thr-pthreads.c: Fix memory leak
+
 2006-02-24  Jeremy Bettis  <jeremy@deadbeef.com>
 
     * misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.

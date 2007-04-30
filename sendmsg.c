@@ -52,10 +52,15 @@ Boston, MA 02110-1301, USA.  */
 /* The uninstalled dispatch table */
 struct sarray *__objc_uninstalled_dtable = 0;   /* !T:MUTEX */
 
-/* Hook for method forwarding. If it is set, is invoked to return a
-   function that performs the real forwarding. Otherwise the libgcc
-   based functions (__builtin_apply and friends) are used. */
+/* Two hooks for method forwarding. If either is set, it is invoked
+ * to return a function that performs the real forwarding.  If both
+ * are set, the result of __objc_msg_forward2 will be preferred over
+ * that of __objc_msg_forward.  If both return NULL or are unset,
+ * the libgcc based functions (__builtin_apply and friends) are
+ * used.
+ */
 IMP (*__objc_msg_forward) (SEL) = NULL;
+IMP (*__objc_msg_forward2) (id, SEL) = NULL;
 
 /* Send +initialize to class */
 static void __objc_send_initialize (Class);
@@ -90,7 +95,14 @@ IMP
 __objc_get_forward_imp (SEL sel)
 {
   /* If a custom forwarding hook was registered, try getting a forwarding
-   * function from it.  */
+     function from it. There are two forward routine hooks, one that
+     takes the receiver as an argument and one that does not. */
+  if (__objc_msg_forward2)
+    {
+      IMP result;
+      if ((result = __objc_msg_forward2 (rcv, sel)) != NULL)
+       return result;
+    }
   if (__objc_msg_forward)
     {
       IMP result;
