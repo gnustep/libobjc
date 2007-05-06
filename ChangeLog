@@ -6,20 +6,22 @@
 
 2006-02-24  Jeremy Bettis  <jeremy@deadbeef.com>
 
-    * misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.
-    * init.c: (objc_send_load): Removed the check for NXConstantString class to fix +load.
+	* misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.
+	* init.c: (objc_send_load): Removed the check for NXConstantString class to fix +load.
     	(again see:ChangeLog.GNUstep Tue Feb 11 17:11:00 2003)
     
 2006-02-21  Jeremy Bettis  <jeremy@deadbeef.com>
 
-	* thr-win32.c: (__objc_thread_detach): Removed duplicate definitions of thread_id and win32_handle.
+	* thr-win32.c: (__objc_thread_detach): Removed duplicate
+	definitions of thread_id and win32_handle.
 	* objc/objc-decls.h: Don't use __dllspec on mingw platform.
 		
 2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
 
-	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC bug 23214
-		(http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23214) In some odd circumstances
-		protocols are not properly initalized.  See the Bugzilla page for testcase.
+	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC
+	bug 23214 (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23214) In
+	some odd circumstances protocols are not properly initalized.  See
+	the Bugzilla page for testcase.
 	
 2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
 
