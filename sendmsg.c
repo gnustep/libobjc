@@ -74,8 +74,7 @@ static void __objc_init_install_dtable (id, SEL);
    return type for the selector.
    __objc_block_forward for structures.
    __objc_double_forward for floats/doubles.
-   __objc_word_forward for pointers or types that fit in registers.
-   */
+   __objc_word_forward for pointers or types that fit in registers. */
 static double __objc_double_forward (id, SEL, ...);
 static id __objc_word_forward (id, SEL, ...);
 typedef struct { id many[8]; } __big;
@@ -92,7 +91,7 @@ id nil_method (id, SEL);
 /* Given a selector, return the proper forwarding implementation. */
 inline
 IMP
-__objc_get_forward_imp (SEL sel)
+__objc_get_forward_imp (id rcv, SEL sel)
 {
   /* If a custom forwarding hook was registered, try getting a forwarding
      function from it. There are two forward routine hooks, one that
@@ -111,7 +110,7 @@ __objc_get_forward_imp (SEL sel)
     }
 
   /* In all other cases, use the default forwarding functions built using
-   * __builtin_apply and friends.  */
+     __builtin_apply and friends.  */
     {
       const char *t = sel->sel_types;
 
@@ -180,7 +179,7 @@ get_imp (Class class, SEL sel)
 		 is not in the dispatch table.  So the method just
 		 doesn't exist for the class.  Return the forwarding
 		 implementation. */
-	      res = __objc_get_forward_imp (sel);
+             res = __objc_get_forward_imp ((id)class, sel);
 	    }
 	}
     }
@@ -249,7 +248,7 @@ objc_msg_lookup (id receiver, SEL op)
 		{
 		  /* If the method still just doesn't exist for the
 		     class, attempt to forward the method. */
-		  result = __objc_get_forward_imp (op);
+		  result = __objc_get_forward_imp (receiver, op);
 		}
 	    }
 	}

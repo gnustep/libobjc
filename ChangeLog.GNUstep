@@ -1,9 +1,24 @@
+2007-05-06  Nicola Pero  <nicola.pero@meta-innovation.com>
+
+	* ChangeLog: Removed GNUstep-specific entries.  This is supposed
+	to be a copy of GCC's ChangeLog.
+	* ChangeLog.GNUstep: Added GNUstep-specific entries that were
+	removed from ChangeLog.
+
+	* gc.c, sendmsg.c, objc/objc-api.h, objc/objc-list.h, encoding.c,
+	thr-objc.c: Imported latest changes from GCC's libobjc.  See
+	ChangeLog for details.
+
 2007-05-06  Nicola Pero  <nicola.pero@meta-innovation.com>	
 
 	* configure: Added code at the very beginning to print an help
 	message and abort.  Users who don't read the README.GNUstep
 	might otherwise try to run configure, messing everything up.
 
+2007-04-30  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* thr-pthreads.c: Fix memory leak
+	
 2007-02-28  Nicola Pero  <nicola.pero@meta-innovation.com>	
 
 	* GNUmakefile (GNUSTEP_MAKEFILES): Use gnustep-config to
@@ -24,6 +39,29 @@
 	* GNUmakefile: Drop library.make hack that was used to support
 	versions of gnustep-make older than October 2001.  If your
 	gnustep-make is that old, please upgrade.
+
+	2006-02-24  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.
+	* init.c: (objc_send_load): Removed the check for NXConstantString class to fix +load.
+    	(again see:ChangeLog.GNUstep Tue Feb 11 17:11:00 2003)
+    
+2006-02-21  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* thr-win32.c: (__objc_thread_detach): Removed duplicate
+	definitions of thread_id and win32_handle.
+	* objc/objc-decls.h: Don't use __dllspec on mingw platform.
+		
+2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC
+	bug 23214 (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23214) In
+	some odd circumstances protocols are not properly initalized.  See
+	the Bugzilla page for testcase.
+
+2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+
+	* thr-win32.c: There is no such define __MINGW__, changed to __MINGW32__
 
 2006-01-20  Adam Fedor  <fedor@gnu.org>
 

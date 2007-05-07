@@ -1,42 +1,44 @@
-2007-04-30  Richard Frith-Macdonald <rfm@gnu.org>
+2007-04-21  Andrew Ruder  <andy@aeruder.net>
 
-	* sendmsg.c: Add forward2
-	* objc/objc-api.h: Add forward2
-	* thr-pthreads.c: Fix memory leak
+	* sendmsg.c (__objc_get_forward_imp): Call
+	__objc_msg_forward2 for real.
 
-2006-02-24  Jeremy Bettis  <jeremy@deadbeef.com>
+2007-04-09  Andrew Ruder  <andy@aeruder.net>
 
-	* misc.c: Added some missing objc_DECLARE keywords on function pointer definitions.
-	* init.c: (objc_send_load): Removed the check for NXConstantString class to fix +load.
-    	(again see:ChangeLog.GNUstep Tue Feb 11 17:11:00 2003)
-    
-2006-02-21  Jeremy Bettis  <jeremy@deadbeef.com>
+	* sendmsg.c: Added __objc_msg_forward2, a hook that allows
+	external libraries to provide a function that returns the real
+	forwarding function based on both the selector and the receiver.
+	* objc/objc-api.h: Define __objc_msg_forward2.
 
-	* thr-win32.c: (__objc_thread_detach): Removed duplicate
-	definitions of thread_id and win32_handle.
-	* objc/objc-decls.h: Don't use __dllspec on mingw platform.
-		
-2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+2007-02-18  Manuel Lopez-Ibanez  <manu@gcc.gnu.org>
 
-	* init.c (objc_init_statics, __objc_init_protocols): Fix to GCC
-	bug 23214 (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23214) In
-	some odd circumstances protocols are not properly initalized.  See
-	the Bugzilla page for testcase.
+	* objc/objc-list.h (list_free): Add keyword 'inline' to avoid
+	unused warning.
 	
-2006-02-10  Jeremy Bettis  <jeremy@deadbeef.com>
+2006-10-31  Geoffrey Keating  <geoffk@apple.com>
 
-	* thr-win32.c: There is no such define __MINGW__, changed to __MINGW32__
+	* encoding.c (darwin_rs6000_special_round_type_align): New.
 	
-2006-01-20  Adam Fedor  <fedor@gnu.org>
+2006-02-21  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
 
-	* Import from recent gcc repository 2006-01-03 with fixups (see
-	ChangeLog for more info).
-	* ChangeLog, GNUmakefile, Protocol.m, encoding.c, hash.c, init.c,
-	libobjc.def, linking.c, sarray.c, selector.c, sendmsg.c, thr-mach.c,
-	thr-objc.c, thr-posix.c, thr-win32.c, objc/hash.h, objc/objc-api.h,
-	objc/objc-decls.h, objc/runtime.h: Import and fixup.
+	PR libobjc/26309
+	* thr-objc.c (_XOPEN_SOURCE): Don't define on Tru64 UNIX.
 
-	* README.GNUstep: Update.
+2006-01-24  David Ayers  <d.ayers@inode.at>
+
+	PR libobjc/9751
+	* gc.c (class_ivar_set_gcinvisible): Replace strncpy with memcpy
+	and insure the new strings are '\0' termintated.
+
+2006-01-24  David Ayers  <d.ayers@inode.at>
+
+	PR libobjc/13946
+	* configure.ac: Add include directives for --enable-objc-gc.
+	* Makefile.in: Ditto.
+	* configure: Regenerate.
+
+	* gc.c (__objc_class_structure_encoding): Increment the used bytes
+	instead of the local pointer to them.
 
 2005-12-14  Andrew Pinski  <pinskia@physics.uc.edu>
 
