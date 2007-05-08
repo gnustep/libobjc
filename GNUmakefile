@@ -34,7 +34,7 @@ endif
 include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = gnustep-objc
-VERSION=1.4.0
+VERSION=1.6.0
 SVN_MODULE_NAME = libobjc
 SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/libs
 SVN_TAG_NAME=objc

@@ -26,6 +26,11 @@ make install
 ------------------------------------------------------------------------
 Changes:
 ------------------------------------------------------------------------
+Version 1.6.0
+-------------
+Update to latest gcc changes. 
+Fix makefiles for GNUstep make 2.0 release.
+
 Version 1.4.0
 -------------
 Fix the protocol initizization bug, various other protocol bugs.

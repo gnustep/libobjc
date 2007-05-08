@@ -1,3 +1,7 @@
+2007-05-07  Adam Fedor  <fedor@gnu.org>
+
+	* Version 1.60
+
 2007-05-06  Nicola Pero  <nicola.pero@meta-innovation.com>
 
 	* ChangeLog: Removed GNUstep-specific entries.  This is supposed
