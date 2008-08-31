@@ -85,6 +85,7 @@ libobjc_HEADER_FILES = \
 libobjc_OBJC_FILES = \
 	Object.m	\
 	Protocol.m	\
+	synchronization.m \
 	linking.m
 
 ifeq ($(GNUSTEP_TARGET_OS), cygwin)
