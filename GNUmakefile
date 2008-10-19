@@ -58,7 +58,6 @@ ifeq ($(GNUSTEP_TARGET_OS), cygwin)
 THREADING = win32
 endif
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)      
-THREADING = single
 INTERNAL_CFLAGS += -no-cpp-precomp
 INTERNAL_OBJCFLAGS += -no-cpp-precomp
 endif
