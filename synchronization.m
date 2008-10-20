@@ -61,9 +61,10 @@ static objc_mutex_t table_lock = NULL;
 /**
  * Initialize the table lock.
  */
-static void sync_lock_init()
+static void
+sync_lock_init()
 {
- if(table_lock == NULL)
+  if (table_lock == NULL)
     {
       table_lock = objc_mutex_allocate();
     }
@@ -72,18 +73,19 @@ static void sync_lock_init()
 /**
  * Find the node in the list.
  */
-lock_node_t* objc_sync_find_node(id obj)
+lock_node_t*
+objc_sync_find_node(id obj)
 {
-  lock_node_t *current = NULL;
+  lock_node_t *current = lock_list;
 
-  if(lock_list != NULL)
+  if (lock_list != NULL)
     {
       // iterate over the list looking for the end...
-      while(current != NULL)
+      while (current != NULL)
 	{
 	  // if the current object is the one, breal and
 	  // return that node.
-	  if(current->obj == obj)
+	  if (current->obj == obj)
 	    {
 	      break;
 	    }
@@ -98,18 +100,16 @@ lock_node_t* objc_sync_find_node(id obj)
 /**
  * Add a node for the object, if one doesn't already exist.
  */
-lock_node_t* objc_sync_add_node(id obj)
+lock_node_t*
+objc_sync_add_node(id obj)
 {
   lock_node_t *current = NULL;
 
   // get the lock...
   sync_lock_init();
   
-  // restrict access to the table....
-  objc_mutex_lock(table_lock);
-
   // if the list hasn't been initialized, initialize it.
-  if(lock_list == NULL)
+  if (lock_list == NULL)
     {
       // instantiate the new node and set the list...
       lock_list = malloc(sizeof(lock_node_t));
@@ -127,7 +127,7 @@ lock_node_t* objc_sync_add_node(id obj)
       current = lock_list;
 
       // look for the end of the list.
-      while(current->next)
+      while (current->next)
 	{
 	  current = current->next;
 	}
@@ -135,7 +135,7 @@ lock_node_t* objc_sync_add_node(id obj)
       // instantiate the new node...
       new_node = malloc(sizeof(lock_node_t));
 
-      if(new_node != NULL)
+      if (new_node != NULL)
 	{
 	  // set next and prev...
 	  current->next = new_node;
@@ -147,69 +147,49 @@ lock_node_t* objc_sync_add_node(id obj)
 	}
     }
 
-  if(current != NULL)
+  if (current != NULL)
     {
       // add the object and it's lock
       current->obj = obj;
       current->lock = objc_mutex_allocate();
     }
 
-  // release access to the table...
-  objc_mutex_unlock(table_lock);
-
   return current;
-}
-
-/**
- * Remove the node for the object if one does exist.
- */
-lock_node_t* objc_sync_remove_node(id obj)
-{
-  lock_node_t *curr = NULL;
-
-  // find the node...
-  curr = objc_sync_find_node(obj);
-
-  // if the node is not null, proceed...
-  if(curr != NULL)
-    {
-      // skip the current node in 
-      // the list and remove it from the
-      // prev and next nodes.
-      lock_node_t *prev = NULL;
-      lock_node_t *next = NULL;
-
-      prev = curr->prev;
-      next = curr->next;
-
-      next->prev = prev;
-      prev->next = next;
-    }
-  
-  // return the removed node...
-  return curr;
 }
 
 /**
  * Add a lock for the object.
  */ 
-int objc_sync_enter(id obj)
+int
+objc_sync_enter(id obj)
 {
   lock_node_t *node = NULL;
   int status = 0;
 
+  // lock access to the table until we're done....
+  objc_mutex_lock(table_lock);
+
   node = objc_sync_find_node(obj);
-  if(node == NULL)
+  if (node == NULL)
     {
       node = objc_sync_add_node(obj);
-      if(node == NULL)
+      if (node == NULL)
 	{
+	  // unlock the table....
+	  objc_mutex_unlock(table_lock);  
 	  return OBJC_SYNC_NOT_INITIALIZED;
 	}
     }
 
+  // unlock the table....
+  objc_mutex_unlock(table_lock);  
+
   status = objc_mutex_lock(node->lock);
-  if(status < 1)
+
+  // if the status is more than one, then another thread
+  // has this section locked, so we abort.  A status of -1
+  // indicates that an error occurred.
+  if (status > 1 || status == -1)
     {
       return OBJC_SYNC_NOT_OWNING_THREAD_ERROR;
     }
@@ -220,24 +200,36 @@ int objc_sync_enter(id obj)
 /**
  * Remove a lock for the object.
  */
-int objc_sync_exit(id obj)
+int
+objc_sync_exit(id obj)
 {
   lock_node_t *node = NULL;
   int status = 0;
 
-  node = objc_sync_remove_node(obj);
-  if(node == NULL)
+  // lock access to the table until we're done....
+  objc_mutex_lock(table_lock);
+
+  node = objc_sync_find_node(obj);
+  if (node == NULL)
     {
+      // unlock the table....
+      objc_mutex_unlock(table_lock);  
       return OBJC_SYNC_NOT_INITIALIZED;
     }
 
   status = objc_mutex_unlock(node->lock);
-  if(status < 1)
+
+  // unlock the table....
+  objc_mutex_unlock(table_lock);  
+
+  // if the status is not zero, then we are not the sole
+  // owner of this node.  Also if -1 is returned, this indicates and error
+  // condition.
+  if (status > 0 || status == -1)
     {
       return OBJC_SYNC_NOT_OWNING_THREAD_ERROR;      
     }
  
-  // dealloc the node and return success.
-  free(node);
   return OBJC_SYNC_SUCCESS;  
 }
+

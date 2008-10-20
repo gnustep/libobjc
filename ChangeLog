@@ -1,8 +1,12 @@
+2008-09-01 17:06-EDT Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* config/x86_64/linux-gnu/tconfig.h: Add x86_64 config file.
+
 2008-08-31 11:13-EDT Gregory John Casamento <greg_casamento@yahoo.com>
 
 	* GNUmakefile
-	* synchronization.m: Added objc_sync_exit and objc_sync_enter.  Support for
-	@synchronize.
+	* synchronization.m: Added objc_sync_exit and objc_sync_enter. 
+	Support for @synchronize.
 
 2007-04-21  Andrew Ruder  <andy@aeruder.net>
 
