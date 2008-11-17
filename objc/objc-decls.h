@@ -27,7 +27,7 @@ Boston, MA 02110-1301, USA.  */
 #ifndef __objc_decls_INCLUDE_GNU
 #define __objc_decls_INCLUDE_GNU
 
-#if !defined(__MINGW32__) && (defined (_WIN32) || defined (__WIN32__) || defined (WIN32))
+#if (defined (_WIN32) || defined (__WIN32__) || defined (WIN32))
 
 #ifdef DLL_EXPORT /* defined by libtool (if required) */
 #  define objc_EXPORT  __declspec(dllexport)

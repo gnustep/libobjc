@@ -1,3 +1,14 @@
+2008-11-07  Roland Schwingel <roland.schwingel@onevision.de>
+
+	* sendmsg.c:
+	* thr-win32.c:
+	* thr.c:
+	* Object.m:
+	* archive.c:
+	* objc/objc.h:
+	* objc/objc-decls.h:
+	Cleanups for 64bit mswindows support.
+
 2008-09-01 17:06-EDT Gregory John Casamento <greg_casamento@yahoo.com>
 
 	* config/x86_64/linux-gnu/tconfig.h: Add x86_64 config file.

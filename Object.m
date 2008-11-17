@@ -29,7 +29,11 @@ Boston, MA 02110-1301, USA.  */
 #include "objc/Protocol.h"
 #include "objc/objc-api.h"
 
-extern int errno;
+extern
+#ifdef _WIN32
+__declspec(dllimport)
+#endif
+int errno;
 
 #define MAX_CLASS_NAME_LEN 256
 
@@ -115,13 +119,13 @@ extern int errno;
   return self==anObject;
 }
 
-- (int)compare:anotherObject;
+- (int)compare:(id)anotherObject;
 {
   if ([self isEqual:anotherObject])
     return 0;
   // Ordering objects by their address is pretty useless, 
   // so subclasses should override this is some useful way.
-  else if (self > anotherObject)
+  else if ((id)self > anotherObject)
     return 1;
   else 
     return -1;
