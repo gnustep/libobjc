@@ -1,3 +1,8 @@
+2008-12-18  Nicola Pero <nicola.pero@meta-innovation.com>
+
+	* GNUmakefile (GNUSTEP_CORE_SOFTWARE): Set to YES.
+	(GNUSTEP_INSTALLATION_DOMAIN): Do not set to SYSTEM.
+	
 2008-11-07  Roland Schwingel <roland.schwingel@onevision.de>
 
 	* sendmsg.c:

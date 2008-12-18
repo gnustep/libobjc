@@ -31,6 +31,9 @@ ifeq ($(GNUSTEP_MAKEFILES),)
   $(error You need to set GNUSTEP_MAKEFILES before compiling!)
 endif
 
+GNUSTEP_CORE_SOFTWARE = YES
+export GNUSTEP_CORE_SOFTWARE
+
 include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = gnustep-objc
@@ -38,11 +41,6 @@ VERSION=1.6.0
 SVN_MODULE_NAME = libobjc
 SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/libs
 SVN_TAG_NAME=objc
-
-# FIXME - remove this, but when we remove it, also update
-# gnustep-make's configure.ac script to check in GNUSTEP_LOCAL_ROOT
-# too!  Else this wouldn't be found.
-GNUSTEP_INSTALLATION_DOMAIN = SYSTEM
 
 CLIBRARY_NAME = libobjc
 
