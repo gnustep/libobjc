@@ -1,3 +1,8 @@
+2008-12-19  Nicola Pero <nicola.pero@meta-innovation.com>
+
+	* GNUmakefile (GNUSTEP_CORE_SOFTWARE): Do not set.
+	(PACKAGE_NAME): Set before including common.make.
+	
 2008-12-18  Nicola Pero <nicola.pero@meta-innovation.com>
 
 	* GNUmakefile (GNUSTEP_CORE_SOFTWARE): Set to YES.

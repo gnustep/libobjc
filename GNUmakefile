@@ -31,12 +31,10 @@ ifeq ($(GNUSTEP_MAKEFILES),)
   $(error You need to set GNUSTEP_MAKEFILES before compiling!)
 endif
 
-GNUSTEP_CORE_SOFTWARE = YES
-export GNUSTEP_CORE_SOFTWARE
+PACKAGE_NAME = gnustep-objc
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
-PACKAGE_NAME = gnustep-objc
 VERSION=1.6.0
 SVN_MODULE_NAME = libobjc
 SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/libs
