@@ -1,9 +1,11 @@
 2009-01-31  Nicola Pero <nicola.pero@meta-innovation.com>
 
-	* objc/objc-decls.h: Use BUILD_libobjc_DLL (as defined by
-	gnustep-make), not DLL_EXPORT (as defined by libtool, which we
-	don't use), to decide when to export/import symbols on MinGW32.
-	
+	* objc/objc-decls.h: Reverted last change to get it to compile
+	again on MinGW32.  If we're on Windows, but not MinGW32, use
+	BUILD_libobjc_DLL (as defined by gnustep-make), not DLL_EXPORT (as
+	defined by libtool, which we don't use), to decide when to
+	export/import symbols.
+
 2008-12-19  Nicola Pero <nicola.pero@meta-innovation.com>
 
 	* GNUmakefile (GNUSTEP_CORE_SOFTWARE): Do not set.

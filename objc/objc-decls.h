@@ -27,7 +27,10 @@ Boston, MA 02110-1301, USA.  */
 #ifndef __objc_decls_INCLUDE_GNU
 #define __objc_decls_INCLUDE_GNU
 
-#if (defined (_WIN32) || defined (__WIN32__) || defined (WIN32))
+#if !defined(__MINGW32__) && (defined (_WIN32) || defined (__WIN32__) || defined (WIN32))
+
+# The following code is not needed on MinGW >= 5.1.3 since the compiler will automatically
+# determine which symbols to import/export, at least when compiling using gnustep-make.
 
 #ifdef BUILD_libobjc_DLL /* defined by gnustep-make when compiling libobjc itself */
 #  define objc_EXPORT  __declspec(dllexport)
