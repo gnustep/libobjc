@@ -29,7 +29,7 @@ Boston, MA 02110-1301, USA.  */
 
 #if (defined (_WIN32) || defined (__WIN32__) || defined (WIN32))
 
-#ifdef DLL_EXPORT /* defined by libtool (if required) */
+#ifdef BUILD_libobjc_DLL /* defined by gnustep-make when compiling libobjc itself */
 #  define objc_EXPORT  __declspec(dllexport)
 #  define objc_DECLARE __declspec(dllexport)
 #else
