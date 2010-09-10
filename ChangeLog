@@ -1,3 +1,10 @@
+2010-09-10  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* sendmsg.c: (get_imp) ... fix call to __objc_get_forward_imp to
+	pass nil as the receiver since we don't know the receiver at this
+	point. Passing the class is often wrong and can result in us calling
+	a class method when we want an instance method of the same name.
+
 2010-05-12  Adam Fedor <fedor@gnu.org>
 
 	* Version 1.7.0 Snapshot release
