@@ -1,3 +1,9 @@
+2011-03-05  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* sendmsg.c: ugly code changes to make +initialize thread-safe.
+	Hopefully we'll get something better in the gnu runtime and can
+	stop using this one.
+
 2010-09-10  Richard Frith-Macdonald <rfm@gnu.org>
 
 	* sendmsg.c: (get_imp) ... fix call to __objc_get_forward_imp to

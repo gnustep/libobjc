@@ -49,6 +49,15 @@ Boston, MA 02110-1301, USA.  */
 #define INVISIBLE_STRUCT_RETURN 0
 #endif
 
+/* Maintain a linked list of classes being initialized */
+typedef struct InitializingList {
+  struct InitializingList	*next;
+  Class				class;
+  struct sarray			*dtable;
+} InitializingList_t;
+
+static InitializingList_t	*initializing = 0;
+
 /* The uninstalled dispatch table */
 struct sarray *__objc_uninstalled_dtable = 0;   /* !T:MUTEX */
 
@@ -65,13 +74,115 @@ IMP (*__objc_msg_forward2) (id, SEL) = NULL;
 /* Send +initialize to class */
 static void __objc_send_initialize (Class);
 
-static void __objc_install_dispatch_table_for_class (Class);
+static void __objc_begin_install_dispatch_table_for_class (Class, Class);
+static void __objc_end_install_dispatch_table_for_class (Class);
+static void __objc_install_dispatch_table_for_class (Class, Class);
 
 /* Forward declare some functions */
 static void __objc_init_install_dtable (id, SEL);
 
+/* Now a functio9n to check to see if a class is being initialized.
+ */
+static int
+__objc_is_initializing_dispatch_table(Class c)
+{
+  if (c->dtable == __objc_uninstalled_dtable)
+    {
+      InitializingList_t	*list = initializing;
+
+      while (list != 0)
+	{
+	  if (list->class == c)
+	    {
+	      return 1;
+	    }
+	  list = list->next;
+	}
+    }
+  return 0;
+}
+
+/* Set or remove the dispatch table for an initializing class in the list.
+ * Assumes that __objc_runtime_mutex is locked down.
+ */
+static void
+__objc_set_initializing_dispatch_table(Class c, struct sarray *d)
+{
+  InitializingList_t	*list = initializing;
+
+  if (d == 0)
+    {
+      /* Setting 0 means removing the class */
+      if (list != 0)
+	{
+	  if (list->class == c)
+	    {
+	      initializing = list->next;
+	      objc_free (list);
+	      return;
+	    }
+	  else
+	    {
+	      while (list->next != 0)
+		{
+		  if (list->next->class == c)
+		    {
+		      InitializingList_t	*tmp = list->next;
+
+		      list->next = tmp->next;
+		      objc_free (tmp);
+		      return;
+		    }
+		  list = list->next;
+		}
+	    }
+	}
+    }
+  else
+    {
+      while (list != 0 && list->class != c)
+	{
+	  list = list->next;
+	}
+      if (list == 0)
+	{
+	  list = (InitializingList_t *)objc_malloc (sizeof(InitializingList_t));
+	  list->class = c;
+	  list->dtable = d;
+	  list->next = initializing;
+	  initializing = list;
+	}
+      else
+	{
+	  list->dtable = d;
+	}
+    }
+}
+
+/* Return the dispatch table of a class in the process of initialising.
+ * Assumes that __objc_runtime_mutex is locked down.
+ * If the class is not initializing, this returns the table installed
+ * in the class itsself.
+ */
+static struct sarray *
+__objc_dispatch_table (Class c)
+{
+  InitializingList_t	*list = initializing;
+
+  while (list != 0)
+    {
+      if (list->class == c)
+	{
+	  return list->dtable;
+	}
+      list = list->next;
+    }
+  return c->dtable;
+}
+
 /* Various forwarding functions that are used based upon the
    return type for the selector.
+o
    __objc_block_forward for structures.
    __objc_double_forward for floats/doubles.
    __objc_word_forward for pointers or types that fit in registers. */
@@ -143,8 +254,10 @@ get_imp (Class class, SEL sel)
   void *res = sarray_get_safe (class->dtable, (size_t) sel->sel_id);
   if (res == 0)
     {
+      struct sarray	*dtable;
+
       /* Not a valid method */
-      if (class->dtable == __objc_uninstalled_dtable)
+      if ((dtable = class->dtable) == __objc_uninstalled_dtable)
 	{
 	  /* The dispatch table needs to be installed. */
 	  objc_mutex_lock (__objc_runtime_mutex);
@@ -153,37 +266,31 @@ get_imp (Class class, SEL sel)
 	      __objc_uninstalled_dtable again in case another thread
 	      installed the dtable while we were waiting for the lock
 	      to be released.  */
-         if (class->dtable == __objc_uninstalled_dtable)
-           {
-             __objc_install_dispatch_table_for_class (class);
-           }
 
+ 	  if ((dtable = class->dtable) == __objc_uninstalled_dtable)
+ 	    {
+ 	      dtable = __objc_dispatch_table (class);
+ 	      if (dtable == __objc_uninstalled_dtable)
+ 		{
+ 		  __objc_install_dispatch_table_for_class (class, class);
+ 		  dtable = __objc_dispatch_table (class);
+ 		}
+ 	    }
 	  objc_mutex_unlock (__objc_runtime_mutex);
-	  /* Call ourselves with the installed dispatch table
-	     and get the real method */
-	  res = get_imp (class, sel);
 	}
-      else
-	{
-	  /* The dispatch table has been installed.  */
-
-         /* Get the method from the dispatch table (we try to get it
-	    again in case another thread has installed the dtable just
-	    after we invoked sarray_get_safe, but before we checked
-	    class->dtable == __objc_uninstalled_dtable).
-         */
-	  res = sarray_get_safe (class->dtable, (size_t) sel->sel_id);
-	  if (res == 0)
-	    {
-	      /* The dispatch table has been installed, and the method
-		 is not in the dispatch table.  So the method just
-		 doesn't exist for the class.  Return the forwarding
-		 implementation.
-		 We don't know the receiver (only it's class), so we
-		 can't pass that to the function :-(
-	       */
-             res = __objc_get_forward_imp (nil, sel);
-	    }
+      /* Get the method from the dispatch table (we try to get it
+ 	again in case another thread has installed the dtable just
+ 	after we invoked sarray_get_safe, but before we checked
+ 	class->dtable == __objc_uninstalled_dtable).
+      */
+       res = sarray_get_safe (dtable, (size_t) sel->sel_id);
+       if (res == 0)
+ 	{
+ 	  /* The dispatch table has been installed, and the method
+ 	     is not in the dispatch table.  So the method just
+ 	     doesn't exist for the class.  Return the forwarding
+ 	     implementation. */
+ 	 res = __objc_get_forward_imp ((id)class, sel);
 	}
     }
   return res;
@@ -196,21 +303,28 @@ inline
 BOOL
 __objc_responds_to (id object, SEL sel)
 {
+  struct sarray	*dtable;
   void *res;
 
   /* Install dispatch table if need be */
-  if (object->class_pointer->dtable == __objc_uninstalled_dtable)
+  if ((dtable = object->class_pointer->dtable) == __objc_uninstalled_dtable)
     {
       objc_mutex_lock (__objc_runtime_mutex);
-      if (object->class_pointer->dtable == __objc_uninstalled_dtable)
+      if ((dtable = object->class_pointer->dtable) == __objc_uninstalled_dtable)
 	{
-	  __objc_install_dispatch_table_for_class (object->class_pointer);
+	  dtable = __objc_dispatch_table (object->class_pointer);
+	  if (dtable == __objc_uninstalled_dtable)
+	    {
+	      __objc_install_dispatch_table_for_class (object->class_pointer,
+		object->class_pointer);
+	      dtable = __objc_dispatch_table (object->class_pointer);
+	    }
 	}
       objc_mutex_unlock (__objc_runtime_mutex);
     }
 
   /* Get the method from the dispatch table */
-  res = sarray_get_safe (object->class_pointer->dtable, (size_t) sel->sel_id);
+  res = sarray_get_safe (dtable, (size_t) sel->sel_id);
   return (res != 0);
 }
 
@@ -228,15 +342,27 @@ objc_msg_lookup (id receiver, SEL op)
 				(sidx)op->sel_id);
       if (result == 0)
 	{
-	  /* Not a valid method */
-	  if (receiver->class_pointer->dtable == __objc_uninstalled_dtable)
+	  Class	class = receiver->class_pointer;
+	  struct sarray *dtable;
+
+	  if ((dtable = class->dtable) == __objc_uninstalled_dtable)
 	    {
-	      /* The dispatch table needs to be installed.
-		 This happens on the very first method call to the class. */
-	      __objc_init_install_dtable (receiver, op);
+	       /* Double-checked locking pattern: Check
+		  __objc_uninstalled_dtable again in case another thread
+		  installed the dtable while we were waiting for the lock
+		  to be released.  */
+	      objc_mutex_lock (__objc_runtime_mutex);
+	      dtable = __objc_dispatch_table (class);
+	      if (dtable == __objc_uninstalled_dtable)
+		{
+		  /* The dispatch table needs to be installed.
+		     This happens on the very first method call to the class. */
+		  __objc_init_install_dtable (receiver, op);
+		}
+	      objc_mutex_unlock (__objc_runtime_mutex);
 
 	      /* Get real method for this in newly installed dtable */
-	      result = get_imp (receiver->class_pointer, op);
+	      result = get_imp (class, op);
 	    }
 	  else
 	    {
@@ -300,7 +426,8 @@ __objc_init_install_dtable (id receiver, SEL op __attribute__ ((__unused__)))
   
   /* This may happen, if the programmer has taken the address of a 
      method before the dtable was initialized... too bad for him! */
-  if (receiver->class_pointer->dtable != __objc_uninstalled_dtable)
+  if (__objc_dispatch_table (receiver->class_pointer)
+    != __objc_uninstalled_dtable)
     {
       objc_mutex_unlock (__objc_runtime_mutex);
       return;
@@ -312,11 +439,14 @@ __objc_init_install_dtable (id receiver, SEL op __attribute__ ((__unused__)))
       assert (CLS_ISCLASS (receiver->class_pointer));
 
       /* install instance methods table */
-      __objc_install_dispatch_table_for_class (receiver->class_pointer);
+      __objc_begin_install_dispatch_table_for_class
+	(receiver->class_pointer, receiver->class_pointer);
 
       /* call +initialize -- this will in turn install the factory 
 	 dispatch table if not already done :-) */
       __objc_send_initialize (receiver->class_pointer);
+
+      __objc_end_install_dispatch_table_for_class (receiver->class_pointer);
     }
   else
     {
@@ -325,9 +455,12 @@ __objc_init_install_dtable (id receiver, SEL op __attribute__ ((__unused__)))
       assert (CLS_ISMETA (receiver->class_pointer));
 
       /* Install real dtable for factory methods */
-      __objc_install_dispatch_table_for_class (receiver->class_pointer);
+      __objc_begin_install_dispatch_table_for_class
+	(receiver->class_pointer, (Class)receiver);
 
       __objc_send_initialize ((Class)receiver);
+
+      __objc_end_install_dispatch_table_for_class (receiver->class_pointer);
     }
   objc_mutex_unlock (__objc_runtime_mutex);
 }
@@ -356,9 +489,6 @@ __objc_send_initialize (Class class)
 
       /* Create the garbage collector type memory description */
       __objc_generate_gc_type_description (class);
-
-      if (class->super_class)
-	__objc_send_initialize (class->super_class);
 
       {
 	SEL 	     op = sel_register_name ("initialize");
@@ -391,14 +521,15 @@ __objc_send_initialize (Class class)
     }
 }
 
-/* Walk on the methods list of class and install the methods in the reverse
+/* Walk on the methods list and install the methods in the reverse
    order of the lists. Since methods added by categories are before the methods
    of class in the methods list, this allows categories to substitute methods
    declared in class. However if more than one category replaces the same
    method nothing is guaranteed about what method will be used.
    Assumes that __objc_runtime_mutex is locked down. */
 static void
-__objc_install_methods_in_dtable (Class class, MethodList_t method_list)
+__objc_install_methods_in_dtable (struct sarray *dtable,
+  MethodList_t method_list)
 {
   int i;
 
@@ -406,21 +537,28 @@ __objc_install_methods_in_dtable (Class class, MethodList_t method_list)
     return;
 
   if (method_list->method_next)
-    __objc_install_methods_in_dtable (class, method_list->method_next);
+    {
+      __objc_install_methods_in_dtable (dtable, method_list->method_next);
+    }
 
   for (i = 0; i < method_list->method_count; i++)
     {
       Method_t method = &(method_list->method_list[i]);
-      sarray_at_put_safe (class->dtable,
+      sarray_at_put_safe (dtable,
 			  (sidx) method->method_name->sel_id,
 			  method->method_imp);
     }
 }
 
-/* Assumes that __objc_runtime_mutex is locked down. */
+/* Assumes that __objc_runtime_mutex is locked down.
+ * If receiver is not null, it is the object whos supercalss must be
+ * initialised if the superclass of the one we are installing the
+ * dispatch table for is not already installed.
+ */
 static void
-__objc_install_dispatch_table_for_class (Class class)
+__objc_begin_install_dispatch_table_for_class (Class class, Class receiver)
 {
+  struct sarray *dtable;
   Class super;
 
   /* If the class has not yet had its class links resolved, we must 
@@ -430,44 +568,118 @@ __objc_install_dispatch_table_for_class (Class class)
 
   super = class->super_class;
 
-  if (super != 0 && (super->dtable == __objc_uninstalled_dtable))
-    __objc_install_dispatch_table_for_class (super);
+  /* If the superclass has not had its dispatch table installed,
+   * we must do that (and send +initialize to it).
+   */
+  if (super != 0 && __objc_dispatch_table(super) == __objc_uninstalled_dtable)
+    {
+      __objc_begin_install_dispatch_table_for_class
+	(super, receiver->super_class);
+      if (CLS_ISMETA (super))
+	{
+	  /* super is a metaclass, so we must send +initialize to the
+	   * superclass of the receiver.
+	   */
+          __objc_send_initialize (receiver->super_class);
+	}
+      else
+	{
+	  /* super is a class and must therefore receive +initialize
+	   */
+          __objc_send_initialize (super);
+	}
+      __objc_end_install_dispatch_table_for_class (super);
+    }
 
   /* Allocate dtable if necessary */
   if (super == 0)
     {
-      objc_mutex_lock (__objc_runtime_mutex);
-      class->dtable = sarray_new (__objc_selector_max_index, 0);
-      objc_mutex_unlock (__objc_runtime_mutex);
+      dtable = sarray_new (__objc_selector_max_index, 0);
     }
   else
-    class->dtable = sarray_lazy_copy (super->dtable);
+    {
+      dtable = sarray_lazy_copy (__objc_dispatch_table (super));
+    }
 
-  __objc_install_methods_in_dtable (class, class->methods);
+  __objc_install_methods_in_dtable (dtable, class->methods);
+  __objc_set_initializing_dispatch_table(class, dtable);
 }
+
+/* Assumes that __objc_runtime_mutex is locked down.
+ * The __objc_begin_install_dispatch_table_for_class() function must have run.
+ */
+static void
+__objc_end_install_dispatch_table_for_class (Class class)
+{
+  class->dtable = __objc_dispatch_table (class);
+  __objc_set_initializing_dispatch_table(class, 0);
+}
+
+/* Assumes that __objc_runtime_mutex is locked down.
+ */
+static void
+__objc_install_dispatch_table_for_class (Class class, Class receiver)
+{
+  if (__objc_is_initializing_dispatch_table(class))
+    {
+      struct sarray *dtable;
+      Class super = class->super_class;
+
+      /* Already in the process of installing/initialising the dispatch
+       * table, so we can assume that the code which started the process
+       * will also end it, and all we need to do is update the table now.
+       */
+      if (super == 0)
+	{
+	  dtable = sarray_new (__objc_selector_max_index, 0);
+	}
+      else
+	{
+          dtable = sarray_lazy_copy (__objc_dispatch_table (super));
+	}
+      __objc_install_methods_in_dtable (dtable, class->methods);
+      __objc_set_initializing_dispatch_table(class, dtable);
+    }
+  else
+    {
+      __objc_begin_install_dispatch_table_for_class (class, receiver);
+      __objc_end_install_dispatch_table_for_class (class);
+    }
+}
+
 
 void
 __objc_update_dispatch_table_for_class (Class class)
 {
-  Class next;
   struct sarray *arr;
-
-  /* not yet installed -- skip it */
-  if (class->dtable == __objc_uninstalled_dtable) 
-    return;
 
   objc_mutex_lock (__objc_runtime_mutex);
 
-  arr = class->dtable;
-  __objc_install_premature_dtable (class); /* someone might require it... */
+  /* not yet installed -- skip it */
+  if ((arr = __objc_dispatch_table (class)) == __objc_uninstalled_dtable) 
+    {
+      objc_mutex_unlock (__objc_runtime_mutex);
+      return;
+    }
+
+  if (__objc_is_initializing_dispatch_table(class) == 0)
+    {
+      __objc_install_premature_dtable (class); /* someone might require it... */
+    }
   sarray_free (arr);			   /* release memory */
 
   /* could have been lazy... */
-  __objc_install_dispatch_table_for_class (class); 
+  __objc_install_dispatch_table_for_class (class, 0); 
 
   if (class->subclass_list)	/* Traverse subclasses */
-    for (next = class->subclass_list; next; next = next->sibling_class)
-      __objc_update_dispatch_table_for_class (next);
+    {
+      Class next;
+
+      for (next = class->subclass_list; next; next = next->sibling_class)
+	{
+          __objc_update_dispatch_table_for_class (next);
+	}
+    }
 
   objc_mutex_unlock (__objc_runtime_mutex);
 }
