@@ -264,51 +264,7 @@ objc_msg_lookup (id receiver, SEL op)
 				(sidx)op->sel_id);
       if (result == 0)
 	{
-	  /* Not a valid method */
-	  if (receiver->class_pointer->dtable == __objc_uninstalled_dtable)
-	    {	      
-	      objc_mutex_lock (__objc_runtime_mutex);
-	      
-	      if (receiver->class_pointer->dtable == __objc_uninstalled_dtable)
-		{
-		  /* The dispatch table needs to be installed.
-		     This happens on the very first method call to the
-		     class. */
-		  __objc_install_dtable_for_class (receiver->class_pointer);
-
-		  /* If we can get the implementation from the newly installed
-		     dtable, +initialize has completed.  */
-		  result = get_imp (receiver->class_pointer, op);
-
-		  /* If not, messages are being sent during +initialize and
-		     we should dispatch them without the installed dtable.
-		     In this case we have locked the mutex recursively
-		     so execution remains in this thread after our unlock. */
-		  if (result == 0 
-		      && (receiver->class_pointer->dtable 
-			  == __objc_uninstalled_dtable))
-		    result
-		      = __objc_get_prepared_imp (receiver->class_pointer, op);
-		}
-
-	      objc_mutex_unlock (__objc_runtime_mutex);
-	    }
-	  else
-	    {
-	      /* The dispatch table has been installed.  Check again
-		 if the method exists (just in case the dispatch table
-		 has been installed by another thread after we did the
-		 previous check that the method exists).
-	      */
-	      result = sarray_get_safe (receiver->class_pointer->dtable,
-					(sidx)op->sel_id);
-	      if (result == 0)
-		{
-		  /* If the method still just doesn't exist for the
-		     class, attempt to forward the method. */
-		  result = __objc_get_forward_imp (receiver, op);
-		}
-	    }
+	  result = get_imp(receiver->class_pointer, op);
 	}
       return result;
     }
@@ -713,7 +669,7 @@ objc_get_uninstalled_dtable ()
 static cache_ptr prepared_dtable_table = 0;
 
 /* This function is called by:
-   objc_msg_lookup, get_imp and __objc_responds_to
+   get_imp and __objc_responds_to
    (and the dispatch table installation functions themselves)
    to install a dispatch table for a class.
 
