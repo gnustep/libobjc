@@ -1,3 +1,8 @@
+2011-03-17  David Ayers <ayers@fsfw.org>, Richard Frith-Macdonald <rfm@gnu.org>
+
+	* sendmsg.c: Replace ugly thread-safety patch with nicer one by
+	David and a few further tweaks by Richard.
+
 2011-03-05  Richard Frith-Macdonald <rfm@gnu.org>
 
 	* sendmsg.c: ugly code changes to make +initialize thread-safe.
