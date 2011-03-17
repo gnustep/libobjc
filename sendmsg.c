@@ -109,7 +109,7 @@ __objc_get_forward_imp (id rcv, SEL sel)
     {
       IMP result;
       if ((result = __objc_msg_forward (sel)) != NULL) 
-        return result;
+	return result;
     }
 
   /* In all other cases, use the default forwarding functions built using
@@ -139,7 +139,74 @@ __objc_get_forward_imp (id rcv, SEL sel)
    Since this requires the dispatch table to be installed, this function
    will implicitly invoke +initialize for CLASS if it hasn't been
    invoked yet.  This also insures that +initialize has been invoked
-   when the returned implementation is called directly.  */
+   when the returned implementation is called directly.
+
+   The forwarding hooks require the receiver as an argument (if they are to
+   perform dynamic lookup in proxy objects etc), so this function has a
+   receiver argument to be used with those hooks.  */
+static inline
+IMP
+get_implementation (id receiver, Class class, SEL sel)
+{
+  void *res;
+
+  if (class->dtable == __objc_uninstalled_dtable)
+    {
+      /* The dispatch table needs to be installed. */
+      objc_mutex_lock (__objc_runtime_mutex);
+
+       /* Double-checked locking pattern: Check
+	  __objc_uninstalled_dtable again in case another thread
+	  installed the dtable while we were waiting for the lock
+	  to be released.  */
+      if (class->dtable == __objc_uninstalled_dtable)
+        __objc_install_dtable_for_class (class);
+
+      /* If the dispatch table is not yet installed,
+	we are still in the process of executing +initialize.
+	But the implementation pointer should be avaliable
+	if it exists at all.  */
+      if (class->dtable == __objc_uninstalled_dtable)
+        {
+	  assert (__objc_prepared_dtable_for_class (class) != 0);
+	  res = __objc_get_prepared_imp (class, sel);
+        }
+      else
+	{
+	  res = 0;
+	}
+
+      objc_mutex_unlock (__objc_runtime_mutex);
+      /* Call ourselves with the installed dispatch table
+	 and get the real method */
+      if (! res)
+	res = get_implementation (receiver, class, sel);
+    }
+  else
+    {
+      /* The dispatch table has been installed.  */
+
+     /* Get the method from the dispatch table (we try to get it
+	again in case another thread has installed the dtable just
+	after we invoked sarray_get_safe, but before we checked
+	class->dtable == __objc_uninstalled_dtable).
+     */
+      res = sarray_get_safe (class->dtable, (size_t) sel->sel_id);
+      if (res == 0)
+	{
+	  /* The dispatch table has been installed, and the method
+	     is not in the dispatch table.  So the method just
+	     doesn't exist for the class.  Return the forwarding
+	     implementation.
+	     We don't know the receiver (only it's class), so we
+	     can't pass that to the function :-(
+	   */
+	 res = __objc_get_forward_imp (receiver, sel);
+	}
+    }
+  return res;
+}
+
 inline
 IMP
 get_imp (Class class, SEL sel)
@@ -155,57 +222,7 @@ get_imp (Class class, SEL sel)
   void *res = sarray_get_safe (class->dtable, (size_t) sel->sel_id);
   if (res == 0)
     {
-      /* Not a valid method */
-      if (class->dtable == __objc_uninstalled_dtable)
-	{
-	  /* The dispatch table needs to be installed. */
-	  objc_mutex_lock (__objc_runtime_mutex);
-
-	   /* Double-checked locking pattern: Check
-	      __objc_uninstalled_dtable again in case another thread
-	      installed the dtable while we were waiting for the lock
-	      to be released.  */
-         if (class->dtable == __objc_uninstalled_dtable)
-	   __objc_install_dtable_for_class (class);
-
-	 /* If the dispatch table is not yet installed,
-	    we are still in the process of executing +initialize.
-	    But the implementation pointer should be avaliable
-	    if it exists at all.  */
-         if (class->dtable == __objc_uninstalled_dtable)
-	   {
-	     assert (__objc_prepared_dtable_for_class (class) != 0);
-	     res = __objc_get_prepared_imp (class, sel);
-	   }
-
-	  objc_mutex_unlock (__objc_runtime_mutex);
-	  /* Call ourselves with the installed dispatch table
-	     and get the real method */
-	  if (! res)
-	    res = get_imp (class, sel);
-	}
-      else
-	{
-	  /* The dispatch table has been installed.  */
-
-         /* Get the method from the dispatch table (we try to get it
-	    again in case another thread has installed the dtable just
-	    after we invoked sarray_get_safe, but before we checked
-	    class->dtable == __objc_uninstalled_dtable).
-         */
-	  res = sarray_get_safe (class->dtable, (size_t) sel->sel_id);
-	  if (res == 0)
-	    {
-	      /* The dispatch table has been installed, and the method
-		 is not in the dispatch table.  So the method just
-		 doesn't exist for the class.  Return the forwarding
-		 implementation.
-		 We don't know the receiver (only it's class), so we
-		 can't pass that to the function :-(
-	       */
-             res = __objc_get_forward_imp (nil, sel);
-	    }
-	}
+      res = get_implementation(nil, class, sel);
     }
   return res;
 }
@@ -264,7 +281,7 @@ objc_msg_lookup (id receiver, SEL op)
 				(sidx)op->sel_id);
       if (result == 0)
 	{
-	  result = get_imp(receiver->class_pointer, op);
+	  result = get_implementation(receiver, receiver->class_pointer, op);
 	}
       return result;
     }
@@ -586,7 +603,7 @@ __objc_forward (id object, SEL sel, arglist_t args)
 
   if (__objc_responds_to (object, frwd_sel))
     {
-      imp = get_imp (object->class_pointer, frwd_sel);
+      imp = get_implementation (object, object->class_pointer, frwd_sel);
       return (*imp) (object, frwd_sel, sel, args);
     }
 
@@ -595,7 +612,7 @@ __objc_forward (id object, SEL sel, arglist_t args)
   err_sel = sel_get_any_uid ("doesNotRecognize:");
   if (__objc_responds_to (object, err_sel))
     {
-      imp = get_imp (object->class_pointer, err_sel);
+      imp = get_implementation (object, object->class_pointer, err_sel);
       return (*imp) (object, err_sel, sel);
     }
   
@@ -614,7 +631,7 @@ __objc_forward (id object, SEL sel, arglist_t args)
     err_sel = sel_get_any_uid ("error:");
     if (__objc_responds_to (object, err_sel))
       {
-	imp = get_imp (object->class_pointer, err_sel);
+	imp = get_implementation (object, object->class_pointer, err_sel);
 	return (*imp) (object, sel_get_any_uid ("error:"), msg);
       }
 
@@ -669,7 +686,7 @@ objc_get_uninstalled_dtable ()
 static cache_ptr prepared_dtable_table = 0;
 
 /* This function is called by:
-   get_imp and __objc_responds_to
+   get_implementation and __objc_responds_to
    (and the dispatch table installation functions themselves)
    to install a dispatch table for a class.
 
