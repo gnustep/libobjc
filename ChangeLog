@@ -1,3 +1,7 @@
+2011-04-19  Adam Fedor <fedor@gnu.org>
+
+	* Version 1.7.1 Snapshot release
+
 2011-03-17  David Ayers <ayers@fsfw.org>, Richard Frith-Macdonald <rfm@gnu.org>
 
 	* sendmsg.c: Replace ugly thread-safety patch with nicer one by
