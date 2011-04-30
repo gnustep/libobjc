@@ -90,7 +90,7 @@ __objc_thread_detach(void (*func)(void *arg), void *arg)
   
   if (!(pthread_create(&new_thread_handle, &_objc_thread_attribs, 
                        (void *)func, arg)))
-    thread_id = *(objc_thread_t *)&new_thread_handle;
+    thread_id = (objc_thread_t)new_thread_handle;
   else
     thread_id = NULL;
   
@@ -174,7 +174,7 @@ __objc_thread_id(void)
 {
   pthread_t self = pthread_self();
 
-  return *(objc_thread_t *)&self;
+  return (objc_thread_t)self;
 }
 
 /* Sets the thread's local storage pointer. */

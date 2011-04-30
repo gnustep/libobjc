@@ -1,5 +1,11 @@
 2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
+	* thr-posix.c (__objc_thread_detach, __objc_thread_id): Replace
+	dubious casts, which can break pointer aliasing rules and may lead
+	to invalid code when optimization is turned on at least on PowerPC.
+
+2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
 	* GNUmakefile: When installing on Darwin/OS X create a symbolic
 	link libobjc-gnu.dylib, since that is what gcc implicitly uses
 	when compiling with -fgnu-runtime.
