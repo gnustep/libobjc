@@ -1,5 +1,10 @@
 2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
+	* init.c (__objc_tree_insert_class): Fix incorrect format
+	specifier in debug printf statement.
+
+2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
 	* thr-posix.c (__objc_thread_detach, __objc_thread_id): Replace
 	dubious casts, which can break pointer aliasing rules and may lead
 	to invalid code when optimization is turned on at least on PowerPC.
