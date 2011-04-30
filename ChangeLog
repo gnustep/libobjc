@@ -1,3 +1,9 @@
+2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GNUmakefile: When installing on Darwin/OS X create a symbolic
+	link libobjc-gnu.dylib, since that is what gcc implicitly uses
+	when compiling with -fgnu-runtime.
+
 2011-04-19  Adam Fedor <fedor@gnu.org>
 
 	* Version 1.7.1 Snapshot release

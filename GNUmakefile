@@ -63,8 +63,10 @@ ifeq ($(GNUSTEP_TARGET_OS), cygwin)
 THREADING = win32
 endif
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)      
+ifeq ($(CC_CPPPRECOMP), yes)
 INTERNAL_CFLAGS += -no-cpp-precomp
 INTERNAL_OBJCFLAGS += -no-cpp-precomp
+endif
 endif
 
 GC_HEADER_FILES_DIR = ./gc/include
@@ -201,6 +203,13 @@ runtime-info.h:
 		rm -f tmp-runtime
 endif
 
+ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)      
+after-install::
+	rm -f $(GNUSTEP_LIBRARIES)/$(GNUSTEP_TARGET_DIR)/libobjc-gnu.dylib
+	ln -s libobjc.dylib $(GNUSTEP_LIBRARIES)/$(GNUSTEP_TARGET_DIR)/libobjc-gnu.dylib
+before-uninstall::
+	rm -f $(GNUSTEP_LIBRARIES)/$(GNUSTEP_TARGET_DIR)/libobjc-gnu.dylib
+endif
 
 after-clean::
 	rm -f runtime-info.h tmp-runtime.s
