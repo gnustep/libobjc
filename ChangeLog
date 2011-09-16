@@ -1,5 +1,6 @@
 2011-09-16  Richard Frith-Macdonald <rfm@gnu.org>
 
+	* Version 1.7.2 Snapshot release
 	* sendmsg.c: fix to send +initialize to class whether the class
 	implements it directly or inherits it (Apple compatibility).
 
