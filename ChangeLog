@@ -1,3 +1,8 @@
+2011-09-16  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* sendmsg.c: fix to send +initialize to class whether the class
+	implements it directly or inherits it (Apple compatibility).
+
 2011-04-30  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* init.c (__objc_tree_insert_class): Fix incorrect format

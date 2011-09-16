@@ -350,32 +350,12 @@ __objc_send_initialize (Class class)
 	__objc_send_initialize (class->super_class);
 
       {
-	SEL 	     op = sel_register_name ("initialize");
-	IMP	     imp = 0;
-        MethodList_t method_list = class->class_pointer->methods;
+	SEL		op = sel_register_name ("initialize");
+        Method_t	method;
 
-        while (method_list) {
-	  int i;
-          Method_t method;
-
-          for (i = 0; i < method_list->method_count; i++) {
-	    method = &(method_list->method_list[i]);
-            if (method->method_name
-                && method->method_name->sel_id == op->sel_id) {
-	      imp = method->method_imp;
-              break;
-            }
-          }
-
-          if (imp)
-            break;
-
-          method_list = method_list->method_next;
-
-	}
-	if (imp)
-	    (*imp) ((id) class, op);
-		
+        method = class_get_class_method(class->class_pointer, op);
+	if (method)
+	  (*method->method_imp) ((id)class, op);
       }
     }
 }
